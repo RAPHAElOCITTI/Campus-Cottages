@@ -7,13 +7,22 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import React from "react";
-import { use } from "react";
+import React, { useEffect, useState } from "react";
+
 
 export default function DescriptionPage(
   {params}: {
     params: { id: string}
   }) {
+
+    const [hostelId, setHostelId] = useState<string>(params.id);
+
+  // Handle the promise if needed during the component's lifecycle
+  useEffect(() => {
+    // If you need to fetch data based on the params.id asynchronously:
+    // fetchHostelData(params.id).then(data => setHostelId(data.id));
+    // For now, we just assign it directly since params.id is available.
+  }, [params.id]);
     
     return (
         <>
@@ -51,7 +60,7 @@ export default function DescriptionPage(
               type="number"
               required
               placeholder="Price per Semester in UGX"
-              min={800000}
+              min={600000}
             />
           </div>
           <div className="flex flex-col gap-y-2">
