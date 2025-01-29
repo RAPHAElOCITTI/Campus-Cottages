@@ -14,6 +14,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Link from "next/link";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { createcampuscottagesHostel } from "../actions";
+import Image from "next/image";
 
 
 
@@ -30,7 +31,7 @@ export async function UserNav(){
                 <div className="rounded-full border px-2 py-2 lg:px-4 lg:py-2 flex items-centre gap-x-3">
                    <MenuIcon className="w-6 h-6 lg:w-5 lg:h-5" />
 
-                   <img 
+                   <Image 
                     src={
                     user?.picture ??
                     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s"

@@ -4,7 +4,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 import { DateRange } from 'react-date-range';
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { eachDayOfInterval } from "date-fns";
 
 
@@ -36,6 +36,9 @@ booking?.forEach((bookingItem) => {
 
     disabledDates = [...disabledDates, ...dateRange];
 })
+
+ 
+
     return (
         <>
         <input type="hidden" name="startDate" value={state[0].startDate.toString()}/>
@@ -52,4 +55,6 @@ booking?.forEach((bookingItem) => {
         />
         </>
     );
-}
+};
+
+

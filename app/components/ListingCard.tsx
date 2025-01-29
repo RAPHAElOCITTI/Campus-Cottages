@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useCountries } from "../lib/getCountries";
 import { AddToFavoriteButton, DeleteFromFavoriteButton } from "./SubmitButtons";
 import { addToFavorite, DeleteFromFavorite } from "../actions";
-import Footer from "./CreationBottomBar";
+
 
 
 interface iAppProps {
@@ -35,6 +35,7 @@ export function ListingCard({
     const {getCountryByValue} = useCountries()
     const country = getCountryByValue(location);
     
+    console.log(country);
 
     return (
         <div className="flex flex-col">

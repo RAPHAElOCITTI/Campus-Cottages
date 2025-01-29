@@ -253,7 +253,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "./lib/db";
 import { supabase } from "./lib/supabase";
 import { revalidatePath } from "next/cache";
-import path from "path";
+
+//import path from "path";
 
 export async function createcampuscottagesHostel({ userId }: { userId: string }) {
   const data = await prisma.hostel.findFirst({
@@ -313,7 +314,9 @@ export async function createCategoryPage(formData: FormData) {
       categoryName: categoryName,
       addedCategory: true,
     },
+    
   });
+  console.log(data);
 
   return redirect(`/create/${hostelId}/description`);
 }
@@ -329,6 +332,8 @@ export async function CreateDescription(formData: FormData) {
   const roomNumber = formData.get("room") as string;
   const kitchenNumber = formData.get('kitchen') as string;
   const bathroomsNumber = formData.get("bathroom") as string;
+
+  
 
   const { data: imageData } = await supabase.storage
     .from("images")
@@ -355,7 +360,10 @@ export async function CreateDescription(formData: FormData) {
       photo: imageData?.path,
       addedDescription: true,
     },
+    
   });
+
+  console.log(data);
 
   return redirect(`/create/${hostelId}/address`);
 }
@@ -373,6 +381,8 @@ export async function createLocation(formData: FormData) {
     },
   });
 
+  console.log(data);
+
   return redirect("/");
 }
 
@@ -388,6 +398,8 @@ export async function addToFavorite(formData: FormData) {
     },
   });
 
+  console.log(data);
+
   revalidatePath(pathName);
 }
 
@@ -395,13 +407,17 @@ export async function DeleteFromFavorite(formData: FormData) {
   const favoriteId = formData.get("favoriteId") as string;
   const pathName = formData.get("pathName") as string;
   const userId = formData.get("userId") as string;
+  
 
   const data = await prisma.favorite.delete({
     where: {
       id: favoriteId,
       userId: userId,
     },
+    
   });
+
+  console.log(data);
 
   revalidatePath(pathName);
 }
@@ -435,6 +451,9 @@ export async function createBooking(formData: FormData) {
          hostelId: hostelId,
      },
  });
+
+
+ console.log(data);
 
  return redirect("/");
 } 

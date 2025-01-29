@@ -55,11 +55,15 @@ export default async function HostelRoute({
 }: {
     params: { id: string };
 }) {
-    const data = await getData(params.id); 
-    const {getCountryByValue} = useCountries();
-    const location = getCountryByValue(data?.location as string);
-    const {getUser} = getKindeServerSession();
+    const userSession = getKindeServerSession(); // ✅ Hook moved outside
+    const { getUser } = userSession;
     const user = await getUser();
+
+    const countries = useCountries(); // ✅ Hook moved outside
+    const { getCountryByValue } = countries;
+
+    const data = await getData(params.id);
+    const location = getCountryByValue(data?.location as string);
     return (
         <div className="w-[75%] mx-auto mt-10 mb-12">
             <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
@@ -82,7 +86,7 @@ export default async function HostelRoute({
                     </div>
 
                     <div className="flex items-center mt-6">
-                        <img src={data?.User?.ProfileImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s"}
+                        <Image src={data?.User?.ProfileImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s"}
                          alt="User Profile" 
                          className="w-11 h-11 rounded-full"
                          />
@@ -110,7 +114,9 @@ export default async function HostelRoute({
                     <input type="hidden" name="hostelId" value={params.id} />
                     <input type="hidden" name="userId" value={user?.id} />
 
-                    <SelectCalendar booking={data?.Booking}/>
+                    <SelectCalendar booking={data?.Booking} />
+
+                    
 
                     {user?.id ? (
                         <BookingSubmitButton />
