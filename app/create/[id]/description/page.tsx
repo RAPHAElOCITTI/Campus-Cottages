@@ -1,4 +1,4 @@
-"use client";
+
 import { CreateDescription } from "@/app/actions";
 import { Counter } from "@/app/components/counter";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
