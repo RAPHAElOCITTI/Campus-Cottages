@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  
+}
+
+model User {
+  id           String   @id @unique
+  ProfileImage String?
+  email        String
+  firstName    String
+  lastName     String
+  Hostel       Hostel[]
+  Favorite     Favorite[]
+  Booking      Booking[]
+}
+
+model Hostel {
+  id               String   @id @default(uuid())
+  title            String?
+  guests           String?
+  rooms            String?
+  Kitchen          String?
+  bathrooms        String?
+  photo            String?
+  price            Int?
+  UserId           String //Required
+  createdAT        DateTime @default(now())
+  addedCategory    Boolean  @default(false)
+  addedDescription Boolean  @default(false)
+  addedLocation    Boolean  @default(false)
+  categoryName     String?
+  description      String?
+  location         String?
+  User             User?    @relation(fields: [UserId], references: [id])
+  Favorite         Favorite[] // One-to-many relationship
+  Booking          Booking[]
+}
+
+
+
+model Favorite {
+  id String @id @default(uuid())
+  User     User?   @relation(fields: [userId], references: [id]) // Optional: Favorite belongs to a user
+  userId   String?
+  hostel   Hostel?  @relation(fields: [hostelId], references: [id]) // Link back to Hostel
+  hostelId String?    // Foreign key for Hostel
+  
+  createAt DateTime @default(now())
+}
+
+model Booking {
+  id String @id @default(uuid())
+
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  User      User? @relation(fields: [userId], references: [id])
+  userId    String?
+  Hostel    Hostel? @relation(fields: [hostelId], references: [id])
+  hostelId  String?
+}
