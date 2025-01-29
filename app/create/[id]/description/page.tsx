@@ -14,11 +14,7 @@ interface PageProps {
   params: {
     
     id: string 
-    then: (onfulfilled: (value: any) => any) => Promise<any>;
-    catch: (onrejected: (reason?: any) => any) => Promise<any>;
-    finally: (onfinally?: (() => void) | undefined) => Promise<any>;
-    [Symbol.toStringTag]: 'Promise'; 
-
+    
   };
 }
 
