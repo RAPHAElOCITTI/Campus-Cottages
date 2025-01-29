@@ -3,8 +3,10 @@ import { ListingCard } from "../components/ListingCard";
 import { NoItems } from "../components/Noitems";
 import { prisma } from "../lib/db";
 import { redirect } from "next/navigation";
+import {unstable_noStore as noStore} from "next/cache"
 
 async function getData(userId: string) {
+    noStore();
     const data = await prisma.booking.findMany ({
         where: {
             userId: userId

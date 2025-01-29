@@ -7,7 +7,7 @@ import { SkeletonCard } from "./components/SkeletonCard";
 import { NoItems } from "./components/Noitems";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Footer from "./components/CreationBottomBar";
-
+import {unstable_noStore as noStore} from "next/cache"
 
 
 
@@ -27,6 +27,7 @@ async function getData({
   };
 }
 ) {
+  noStore ();
   const data = await prisma.hostel.findMany({
     where:{
       addedCategory: true,
