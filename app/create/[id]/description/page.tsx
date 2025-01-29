@@ -9,13 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 
-// Typing for params in the function signature
-type DescriptionPageProps = {
-  params: { id: string };
-};
-
-export default function DescriptionPage({ params }: DescriptionPageProps) {
-  // Ensure that params.id is available before rendering the component
+// Next.js handles dynamic params automatically with the App Router
+export default function DescriptionPage({ params }: { params: { id: string } }) {
   if (!params?.id) {
     return <div>Error: Hostel ID is missing!</div>;
   }
