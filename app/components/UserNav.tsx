@@ -38,6 +38,7 @@ export async function UserNav(){
                     }
                     alt="Image of the user"
                     className="rounded-full h-8 w-8 hidden lg:block"
+                    width={8} height={8}
                     
                     />
                 </div>

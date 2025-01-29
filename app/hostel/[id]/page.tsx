@@ -86,9 +86,11 @@ export default async function HostelRoute({
                     </div>
 
                     <div className="flex items-center mt-6">
-                        <Image src={data?.User?.ProfileImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s"}
+                        <Image 
+                        src={data?.User?.ProfileImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s"}
                          alt="User Profile" 
                          className="w-11 h-11 rounded-full"
+                         width={11} height={11}
                          />
                          <div className="flex flex-col ml-4">
                             <h3 className="font-medium">Hosted by {data?.User?.firstName}</h3>

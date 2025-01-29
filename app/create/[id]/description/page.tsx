@@ -9,8 +9,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 
+// Define the PageProps interface
+interface PageProps {
+  params: {
+    
+    id: string 
+    then: (onfulfilled: (value: any) => any) => Promise<any>;
+    catch: (onrejected: (reason?: any) => any) => Promise<any>;
+    finally: (onfinally?: (() => void) | undefined) => Promise<any>;
+    [Symbol.toStringTag]: 'Promise'; 
+
+  };
+}
+
+
+
 // Next.js handles dynamic params automatically with the App Router
-export default function DescriptionPage({ params }: { params: { id: string } }) {
+export default function DescriptionPage({ params }: PageProps) {
   if (!params?.id) {
     return <div>Error: Hostel ID is missing!</div>;
   }
@@ -18,7 +33,7 @@ export default function DescriptionPage({ params }: { params: { id: string } }) 
   return (
     <>
       <div className="w-3/5 mx-auto">
-        <h2 className="text-3xl font-semibold tracking-tight transition-colors">
+        <h2 className="text-2xl font-semibold tracking-tight transition-colors">
           Please describe your hostel as good as you can!
         </h2>
       </div>
