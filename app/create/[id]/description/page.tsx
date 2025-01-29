@@ -10,13 +10,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import React, { useEffect, useState } from "react";
 
+// Typing for params in the function signature
+type DescriptionPageProps = {
+  params: { id: string };
+};
 
 export default function DescriptionPage(
-  {params}: {
-    params: { id: string}
-  }) {
+  {params}: DescriptionPageProps
+  ) {
 
-    const [hostelId, setHostelId] = useState<string>(params.id);
+    //const [hostelId, setHostelId] = useState<string>(params.id);
 
   // Handle the promise if needed during the component's lifecycle
   useEffect(() => {
