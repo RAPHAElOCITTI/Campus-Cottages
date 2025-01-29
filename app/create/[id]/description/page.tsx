@@ -21,7 +21,7 @@ interface PageProps {
 
 
 // Next.js handles dynamic params automatically with the App Router
-export default function DescriptionPage({ params }: PageProps) {
+export default function DescriptionPage({ params }: { params: {id: string } }) {
   if (!params?.id) {
     return <div>Error: Hostel ID is missing!</div>;
   }
