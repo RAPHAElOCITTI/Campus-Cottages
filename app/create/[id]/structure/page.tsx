@@ -2,18 +2,18 @@ import { createCategoryPage } from "@/app/actions";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
 import { SelectCategory } from "@/app/components/SelectedCategory";
 
-export default async function StructureRoute({ params }: { params: { id: string } }) {
-  try {
+export default function StructureRoute({ params }: { params: { id: string } }) {
+  return new Promise<any>((resolve, reject) => {
     console.log("Resolving params...");
 
-    const resolvedParams = await Promise.resolve(params); // Await the promise resolution
-    console.log("Params resolved:", resolvedParams);
+    Promise.resolve(params)
+      .then((resolvedParams) => {
+        console.log("Params resolved:", resolvedParams);
 
-    if (!resolvedParams?.id) {
-      throw new Error("Error: ID is missing!");
-    }
-
-    return (
+        if (!resolvedParams?.id) {
+          throw new Error("Error: ID is missing!");
+        }
+    resolve (
       <>
         <div className="w-3/5 mx-auto">
           <h2 className="text-3xl font-semibold tracking-tight transition-colors">
@@ -21,6 +21,8 @@ export default async function StructureRoute({ params }: { params: { id: string 
           </h2>
         </div>
 
+        <div>Structure Route Loaded for ID: {resolvedParams.id}</div>
+        
         <form action={createCategoryPage}>
           <input type="hidden" name="hostelId" value={resolvedParams.id} />
           <SelectCategory />
@@ -28,14 +30,18 @@ export default async function StructureRoute({ params }: { params: { id: string 
         </form>
       </>
     );
-}catch (error: Error | unknown) {
-        let errorMessage = 'An unknown error occurred';
-        
-        if (typeof error === 'object' && error !== null) {
-          errorMessage = 'Error: ' + (error as Error).message;
-        }
-      
-        console.error("Error in resolving params:", error);
-        return <div>{errorMessage}</div>;
-      }
+  }) .catch((error) => {
+    console.error("Error in resolving params:", error);
+
+    let errorMessage = "An unknown error occurred";
+    if (error instanceof Error) {
+      errorMessage = "Error: " + error.message;
+    }
+
+    reject(<div>{errorMessage}</div>);
+  })
+  .finally(() => {
+    console.log("Params resolution completed.");
+  });
+  });
 }
