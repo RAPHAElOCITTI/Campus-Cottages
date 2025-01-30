@@ -10,21 +10,16 @@ import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 
 // Define the PageProps interface
-interface PageProps {
-  params: {
-    
-    id: string 
-    
-  };
-}
+
 
 
 
 // Next.js handles dynamic params automatically with the App Router
-export default function DescriptionPage({ params }: { params: Record<string, string> }) {
-  return <div>Hostel ID: {params.id}</div>;
-}
-
+export default function DescriptionPage({
+  params,
+}: {
+  params: { id: string };
+}) {
 
   return (
     <>
