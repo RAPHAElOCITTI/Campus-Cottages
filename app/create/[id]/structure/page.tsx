@@ -1,19 +1,44 @@
 import { createCategoryPage } from "@/app/actions";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
 import { SelectCategory } from "@/app/components/SelectedCategory";
+import { useEffect, useState } from "react";
 
-export default function StructureRoute({ params }: { params: { id: string } }) {
-  return new Promise<any>((resolve, reject) => {
-    console.log("Resolving params...");
+export interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams?: any;
+  }
 
-    Promise.resolve(params)
-      .then((resolvedParams) => {
-        console.log("Params resolved:", resolvedParams);
+export default function StructureRoute({ params }: PageProps) {
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-        if (!resolvedParams?.id) {
-          throw new Error("Error: ID is missing!");
-        }
-    resolve (
+  useEffect(() => {
+    params
+      .then((result) => {
+        console.log("Params resolved:", result);
+        setResolvedParams(result);
+      })
+      .catch((err) => {
+        console.error("Error resolving params:", err);
+        setError("Failed to load hostel details.");
+      })
+      .finally(() => {
+        console.log("Params resolution completed.");
+      });
+  }, [params]);
+
+  // If an error occurred, display it
+  if (error) return <div>{error}</div>;
+
+  // Show loading state while params are resolving
+  if (!resolvedParams) return <div>Loading...</div>;
+
+  // Ensure we have an ID
+  if (!resolvedParams?.id) {
+    return <div>Error: Hostel ID is missing!</div>;
+  }
+
+    return (
       <>
         <div className="w-3/5 mx-auto">
           <h2 className="text-3xl font-semibold tracking-tight transition-colors">
@@ -30,18 +55,4 @@ export default function StructureRoute({ params }: { params: { id: string } }) {
         </form>
       </>
     );
-  }) .catch((error) => {
-    console.error("Error in resolving params:", error);
-
-    let errorMessage = "An unknown error occurred";
-    if (error instanceof Error) {
-      errorMessage = "Error: " + error.message;
-    }
-
-    reject(<div>{errorMessage}</div>);
-  })
-  .finally(() => {
-    console.log("Params resolution completed.");
-  });
-  });
 }
