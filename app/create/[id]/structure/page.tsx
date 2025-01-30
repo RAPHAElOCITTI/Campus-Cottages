@@ -43,12 +43,12 @@ export default function StructureRoute({ params }: PageProps) {
     return (
       <>
         <div className="w-3/5 mx-auto">
-          <h2 className="text-3xl font-semibold tracking-tight transition-colors">
+          <h2 className="text-2xl font-semibold tracking-tight transition-colors">
             Which of the best describes your Hostel?
           </h2>
         </div>
 
-        <div>Structure Route Loaded for ID: {resolvedParams.id}</div>
+        
         
         <form action={createCategoryPage}>
           <input type="hidden" name="hostelId" value={resolvedParams.id} />

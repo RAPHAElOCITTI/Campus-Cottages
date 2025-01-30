@@ -1,5 +1,3 @@
-"use client";
-
 import { createBooking } from "@/app/actions";
 import { CategoryShowcase } from "@/app/components/CategoryShowcase";
 import { HomeMap } from "@/app/components/HomeMap";
@@ -14,7 +12,6 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import {unstable_noStore as noStore} from "next/cache"
-import { useEffect, useState } from "react";
 
  async function getData(hostelid: string) {
     noStore();
@@ -52,26 +49,22 @@ import { useEffect, useState } from "react";
     return data; 
  }
 
- export interface PageProps {
-    params: Promise<{ id: string }>;
-    searchParams?: any;
-  }
 
+export default async function HostelRoute({
+    params
+}: {
+    params: { id: string };
+}) { 
+    
+    const userSession = getKindeServerSession(); // ✅ Hook moved outside
+    const { getUser } = userSession;
+    const user = await getUser();
 
- export default function HostelRoute({ params }: PageProps ) {
-    return new Promise<any>(async (resolve, reject) => {
-      console.log("Fetching hostel data...");
-  
-      const userSession = getKindeServerSession();
-      const { getUser } = userSession;
-  
-      Promise.all([getUser(), getData((await params).id)])
-        .then(async ([user, data]) => {
-          console.log("User and data resolved:", user, data);
-  
-          const countries = useCountries();
-          const { getCountryByValue } = countries;
-          const location = getCountryByValue(data?.location as string);
+    const countries = useCountries(); // ✅ Hook moved outside
+    const { getCountryByValue } = countries;
+
+    const data = await getData(params.id);
+    const location = getCountryByValue(data?.location as string);
     return (
         <div className="w-[75%] mx-auto mt-10 mb-12">
             <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
@@ -121,7 +114,7 @@ import { useEffect, useState } from "react";
                 </div>
 
                 <form action={createBooking}>
-                    <input type="hidden" name="hostelId" value={(await params).id} />
+                    <input type="hidden" name="hostelId" value={params.id} />
                     <input type="hidden" name="userId" value={user?.id} />
 
                     <SelectCalendar booking={data?.Booking} />
@@ -142,6 +135,5 @@ import { useEffect, useState } from "react";
             </div>
         </div>
     );
-});
-    });
+  
 }
