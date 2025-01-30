@@ -1,4 +1,4 @@
-
+"use client";
 import { CreateDescription } from "@/app/actions";
 import { Counter } from "@/app/components/counter";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
@@ -7,7 +7,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // Define the PageProps interface
 
@@ -20,13 +20,36 @@ export interface PageProps {
   searchParams?: any;
 }
 
-export default async function DescriptionPage({ params }: PageProps) {
-  const resolvedParams = await params; // Await the Promise
-  console.log("Params:", resolvedParams); // Debugging output
+export default function DescriptionPage({ params }: PageProps) {
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    params
+      .then((result) => {
+        console.log("Params resolved:", result);
+        setResolvedParams(result);
+      })
+      .catch((err) => {
+        console.error("Error resolving params:", err);
+        setError("Failed to load hostel details.");
+      })
+      .finally(() => {
+        console.log("Params resolution completed.");
+      });
+  }, [params]);
+
+  // If an error occurred, display it
+  if (error) return <div>{error}</div>;
+
+  // Show loading state while params are resolving
+  if (!resolvedParams) return <div>Loading...</div>;
+
+  // Ensure we have an ID
   if (!resolvedParams?.id) {
     return <div>Error: Hostel ID is missing!</div>;
   }
+
   return (
     <>
       <div className="w-3/5 mx-auto">
