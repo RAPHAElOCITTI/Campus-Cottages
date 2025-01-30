@@ -1,3 +1,12 @@
+type Hostel = {
+  id: string;
+  title: string;
+  photo: string;
+  price: number;
+  description: string;
+  location: string;
+  Favorite: Array<{ id: string }>;
+};
 
 import { MapFilterItems } from "./components/MapFilterItems";
 import { prisma } from "./lib/db";
@@ -26,8 +35,9 @@ async function getData({
     bathroom?: string;
   };
 }
-) {
+): Promise<any> {
   noStore ();
+  try {
   const data = await prisma.hostel.findMany({
     where:{
       addedCategory: true,
@@ -59,6 +69,12 @@ async function getData({
   
   
   return data;
+} catch (error) {
+  console.error("Error fetching hostel data:", error);
+  return [];
+} finally {
+  console.log("Finished fetching hostel data");
+}
 }
 
 export default  async function Hostel({
@@ -72,7 +88,8 @@ export default  async function Hostel({
     kitchen?: string;
     bathroom?: string;
   };
-}) {
+}): Promise<any> {
+  try {
 return (
     <div className="container mx-auto px-5 lg:px-10">
       <MapFilterItems />
@@ -83,7 +100,14 @@ return (
       
     </div>
   );
-}  
+}  catch (error) {
+  console.error("Error rendering Hostel component:", error);
+  return <div>Error loading hostels</div>;
+} finally {
+  console.log("Finished rendering Hostel component");
+}
+}
+
 
 async function ShowItems({
   searchParams,
@@ -96,7 +120,8 @@ async function ShowItems({
     kitchen?: string;
     bathroom?: string;
   };
-}) {
+}): Promise<any> {
+  try {
   const {getUser} = getKindeServerSession()
   const user = await getUser()
   const data = await getData({searchParams: searchParams, UserId: user?.id });
@@ -112,7 +137,7 @@ async function ShowItems({
     md:grid-cols-3 
     gap-8
     mt-8">
-     {data.map((item) => (
+131:      {data.map((item: Hostel) => (
        <ListingCard 
        key={item.id} 
        title={item.title as string}
@@ -132,6 +157,13 @@ async function ShowItems({
     </>
   );
  
+}
+catch (error) {
+  console.error("Error loading ShowItems:", error);
+  return <div>Error loading items</div>;
+} finally {
+  console.log("Finished rendering ShowItems");
+}
 }
 
 
