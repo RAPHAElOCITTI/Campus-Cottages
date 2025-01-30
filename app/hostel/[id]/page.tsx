@@ -1,3 +1,5 @@
+"use client";
+
 import { createBooking } from "@/app/actions";
 import { CategoryShowcase } from "@/app/components/CategoryShowcase";
 import { HomeMap } from "@/app/components/HomeMap";
@@ -12,6 +14,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import {unstable_noStore as noStore} from "next/cache"
+import { useEffect, useState } from "react";
 
  async function getData(hostelid: string) {
     noStore();
@@ -49,16 +52,21 @@ import {unstable_noStore as noStore} from "next/cache"
     return data; 
  }
 
+ export interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams?: any;
+  }
 
- export default function HostelRoute({ params }: { params: { id: string } }) {
-    return new Promise<any>((resolve, reject) => {
+
+ export default function HostelRoute({ params }: PageProps ) {
+    return new Promise<any>(async (resolve, reject) => {
       console.log("Fetching hostel data...");
   
       const userSession = getKindeServerSession();
       const { getUser } = userSession;
   
-      Promise.all([getUser(), getData(params.id)])
-        .then(([user, data]) => {
+      Promise.all([getUser(), getData((await params).id)])
+        .then(async ([user, data]) => {
           console.log("User and data resolved:", user, data);
   
           const countries = useCountries();
@@ -113,7 +121,7 @@ import {unstable_noStore as noStore} from "next/cache"
                 </div>
 
                 <form action={createBooking}>
-                    <input type="hidden" name="hostelId" value={params.id} />
+                    <input type="hidden" name="hostelId" value={(await params).id} />
                     <input type="hidden" name="userId" value={user?.id} />
 
                     <SelectCalendar booking={data?.Booking} />
