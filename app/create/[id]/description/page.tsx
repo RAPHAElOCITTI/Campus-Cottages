@@ -1,4 +1,4 @@
-"use client";
+
 import { CreateDescription } from "@/app/actions";
 import { Counter } from "@/app/components/counter";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
@@ -21,12 +21,10 @@ interface PageProps {
 
 
 // Next.js handles dynamic params automatically with the App Router
-export default function DescriptionPage({ params }: { params: {id: string } }) {
-  if (!params || typeof params !== "string") {
-    throw new Error("Invalid params received");
-  } {
-    return <div>Error: Hostel ID is missing!</div>;
-  }
+export default function DescriptionPage({ params }: { params: Record<string, string> }) {
+  return <div>Hostel ID: {params.id}</div>;
+}
+
 
   return (
     <>
