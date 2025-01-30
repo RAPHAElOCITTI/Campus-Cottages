@@ -1,3 +1,5 @@
+"use client";
+
 import { createCategoryPage } from "@/app/actions";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
 import { SelectCategory } from "@/app/components/SelectedCategory";
