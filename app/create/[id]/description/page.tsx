@@ -15,14 +15,16 @@ import React from "react";
 
 
 // Next.js handles dynamic params automatically with the App Router
-interface PageProps {
-  params: { id: string };
+export interface PageProps {
+  params: Promise<{ id: string }>;
+  searchParams?: any;
 }
 
-export default function DescriptionPage({ params }: PageProps) {
-  console.log("Params:", params); // Debugging output
+export default async function DescriptionPage({ params }: PageProps) {
+  const resolvedParams = await params; // Await the Promise
+  console.log("Params:", resolvedParams); // Debugging output
 
-  if (!params?.id) {
+  if (!resolvedParams?.id) {
     return <div>Error: Hostel ID is missing!</div>;
   }
   return (
@@ -35,7 +37,7 @@ export default function DescriptionPage({ params }: PageProps) {
 
       <form action={CreateDescription}>
         <div>
-          <input type="hidden" name="hostelId" value={params.id} />
+          <input type="hidden" name="hostelId" value={resolvedParams.id} />
         </div>
 
         <div className="mx-auto w-3/5 mt-10 flex flex-col gap-y-5 mb-36">
