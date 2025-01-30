@@ -15,12 +15,17 @@ import React from "react";
 
 
 // Next.js handles dynamic params automatically with the App Router
-export default function DescriptionPage({
-  params,
-}: {
+interface PageProps {
   params: { id: string };
-}) {
+}
 
+export default function DescriptionPage({ params }: PageProps) {
+  console.log("Params:", params); // Debugging output
+
+  if (!params?.id) {
+    return <div>Error: Hostel ID is missing!</div>;
+  }
+  
   return (
     <>
       <div className="w-3/5 mx-auto">
