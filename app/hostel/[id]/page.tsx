@@ -50,20 +50,20 @@ import {unstable_noStore as noStore} from "next/cache"
  }
 
 
-export default async function HostelRoute({
-    params
-}: {
-    params: { id: string };
-}) {
-    const userSession = getKindeServerSession(); // ✅ Hook moved outside
-    const { getUser } = userSession;
-    const user = await getUser();
-
-    const countries = useCountries(); // ✅ Hook moved outside
-    const { getCountryByValue } = countries;
-
-    const data = await getData(params.id);
-    const location = getCountryByValue(data?.location as string);
+ export default function HostelRoute({ params }: { params: { id: string } }) {
+    return new Promise<any>((resolve, reject) => {
+      console.log("Fetching hostel data...");
+  
+      const userSession = getKindeServerSession();
+      const { getUser } = userSession;
+  
+      Promise.all([getUser(), getData(params.id)])
+        .then(([user, data]) => {
+          console.log("User and data resolved:", user, data);
+  
+          const countries = useCountries();
+          const { getCountryByValue } = countries;
+          const location = getCountryByValue(data?.location as string);
     return (
         <div className="w-[75%] mx-auto mt-10 mb-12">
             <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
@@ -134,5 +134,6 @@ export default async function HostelRoute({
             </div>
         </div>
     );
-  
+});
+    });
 }
