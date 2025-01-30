@@ -25,7 +25,6 @@ export default function DescriptionPage({ params }: PageProps) {
   if (!params?.id) {
     return <div>Error: Hostel ID is missing!</div>;
   }
-  
   return (
     <>
       <div className="w-3/5 mx-auto">
