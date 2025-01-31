@@ -29,8 +29,8 @@ interface SearchParams {
 }
 
 interface HostelProps {
-  params: { id: string };
-  searchParams?: SearchParams;
+  params: Promise<{ id: string }>;
+    searchParams?: any;
 }
 
 export const metadata: Metadata = {

@@ -1,3 +1,4 @@
+
 import { createBooking } from "@/app/actions";
 import { CategoryShowcase } from "@/app/components/CategoryShowcase";
 import { HomeMap } from "@/app/components/HomeMap";
@@ -53,10 +54,11 @@ import { ResolvingMetadata } from 'next';
     return data; 
  }
 
- interface HostelRouteProps {
+ export interface PageProps {
     params: Promise<{ id: string }>;
-    searchParams: { [key: string]: string | string[] | undefined };
-  }
+    searchParams?: any;
+
+ }
 
 
   export async function generateMetadata(
@@ -74,7 +76,7 @@ import { ResolvingMetadata } from 'next';
 
 
 export default async function HostelRoute({
-    params, searchParams }: HostelRouteProps) { 
+    params, searchParams }: PageProps) { 
     
     const userSession = getKindeServerSession(); // ✅ Hook moved outside
     const { getUser } = userSession;
