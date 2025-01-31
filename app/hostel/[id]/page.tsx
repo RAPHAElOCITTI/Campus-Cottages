@@ -16,6 +16,7 @@ import {unstable_noStore as noStore} from "next/cache"
 import { Metadata } from 'next';
 import { ResolvingMetadata } from 'next';
 
+
  async function getData(hostelid: string) {
     noStore();
     const data = await prisma.hostel.findUnique({
@@ -53,16 +54,17 @@ import { ResolvingMetadata } from 'next';
  }
 
  interface HostelRouteProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
     searchParams: { [key: string]: string | string[] | undefined };
   }
 
 
   export async function generateMetadata(
-    { params, searchParams }: HostelRouteProps,
+    { params, searchParams }: { params: Promise<{ id: string }>; searchParams: any },
     parent: ResolvingMetadata
   ): Promise<Metadata> {
-    const data = await getData(params.id);
+    const resolvedParams = await params;  // ✅ Await params
+    const data = await getData(resolvedParams.id);
   
     return {
       title: data?.title || 'Hostel Details',
@@ -81,7 +83,7 @@ export default async function HostelRoute({
     const countries = useCountries(); // ✅ Hook moved outside
     const { getCountryByValue } = countries;
 
-    const data = await getData(params.id);
+    const data = await getData((await params).id);
     const location = getCountryByValue(data?.location as string);
     return (
         <div className="w-[75%] mx-auto mt-10 mb-12">
@@ -132,7 +134,7 @@ export default async function HostelRoute({
                 </div>
 
                 <form action={createBooking}>
-                    <input type="hidden" name="hostelId" value={params.id} />
+                    <input type="hidden" name="hostelId" value={(await params).id} />
                     <input type="hidden" name="userId" value={user?.id} />
 
                     <SelectCalendar booking={data?.Booking} />
