@@ -8,6 +8,7 @@ type Hostel = {
   Favorite: Array<{ id: string }>;
 };
 
+import { Metadata } from 'next';
 import { MapFilterItems } from "./components/MapFilterItems";
 import { prisma } from "./lib/db";
 import { ListingCard } from "./components/ListingCard";
@@ -26,6 +27,16 @@ interface SearchParams {
   kitchen?: string;
   bathroom?: string;
 }
+
+interface HostelProps {
+  params: { id: string };
+  searchParams?: SearchParams;
+}
+
+export const metadata: Metadata = {
+  title: 'Hostel Listings',
+  description: 'View our available hostels',
+};
 
 async function getData({
   searchParams,
@@ -82,10 +93,7 @@ async function getData({
 }
 
 export default async function Hostel({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
+  params, searchParams }: HostelProps) {
   try {
     return (
       <div className="container mx-auto px-5 lg:px-10">
