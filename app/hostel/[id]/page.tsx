@@ -13,6 +13,9 @@ import Image from "next/image";
 import Link from "next/link";
 import {unstable_noStore as noStore} from "next/cache"
 
+import { Metadata } from 'next';
+import { ResolvingMetadata } from 'next';
+
  async function getData(hostelid: string) {
     noStore();
     const data = await prisma.hostel.findUnique({
@@ -49,12 +52,27 @@ import {unstable_noStore as noStore} from "next/cache"
     return data; 
  }
 
+ interface HostelRouteProps {
+    params: { id: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+  }
+
+
+  export async function generateMetadata(
+    { params, searchParams }: HostelRouteProps,
+    parent: ResolvingMetadata
+  ): Promise<Metadata> {
+    const data = await getData(params.id);
+  
+    return {
+      title: data?.title || 'Hostel Details',
+      description: data?.description || 'View details about this hostel',
+    };
+  }
+
 
 export default async function HostelRoute({
-    params
-}: {
-    params: { id: string };
-}) { 
+    params, searchParams }: HostelRouteProps) { 
     
     const userSession = getKindeServerSession(); // ✅ Hook moved outside
     const { getUser } = userSession;
