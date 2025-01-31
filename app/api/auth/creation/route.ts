@@ -32,5 +32,6 @@ export async function GET(){
         });
     }
 
-    return NextResponse.redirect(`https://campus-cottages.vercel.app`);
+    return NextResponse.redirect(`https://campus-cottages.com`);
+    
 }
