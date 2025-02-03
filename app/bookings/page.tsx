@@ -12,6 +12,7 @@ async function getData(userId: string) {
             userId: userId
         },
             select: {
+                id: true, // 👈 Ensure the booking ID is selected
                 Hostel: {
                     select: {
                         id: true,
@@ -58,7 +59,7 @@ export default async function BookingRoute() {
                         ">
                             {data.map((item) => (
                             <ListingCard 
-                                key={`booking-${item.Hostel?.id}`} 
+                                key={`booking-${item.Hostel?.id}-${item?.id}`} 
                                 title={item.Hostel?.title as string}// Add this line
                                 description={item.Hostel?.description as string}
                                 location={item.Hostel?.location as string}
