@@ -18,7 +18,7 @@ async function getData(userId: string) {
                         id: true,
                         location: true,
                         title: true,
-                        photo: true,
+                        photos: true,
                         description: true,
                         price: true,
                         Favorite: true,
@@ -65,7 +65,7 @@ export default async function BookingRoute() {
                                 location={item.Hostel?.location as string}
                                 pathName="/favorites"
                                 hostelId={item.Hostel?.id as string}
-                                imagePath={item.Hostel?.photo as string}
+                                imagePaths={item.Hostel?.photos as string[]} // Pass an array of images
                                 price={item.Hostel?.price as number}
                                 userId={user.id}
                                 favoriteId={item.Hostel?.Favorite[0]?.id as string}

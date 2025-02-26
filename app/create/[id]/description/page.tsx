@@ -3,13 +3,19 @@ import { CreateDescription } from "@/app/actions";
 import { Counter } from "@/app/components/counter";
 import { CreateBottomBar } from "@/app/components/CreationBottomBar";
 import { CreateSubmit } from "@/app/components/SubmitButtons";
+import MyComponent from "@/app/UploadHandling";
+import uploadHandler  from "@/app/UploadHandler"; // Import uploadHandler
 import { Card, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import React, { useEffect, useState } from "react";
 
-// Define the PageProps interface
+
+
+
+
+
 
 
 
@@ -94,10 +100,11 @@ export default function DescriptionPage({ params }: PageProps) {
             />
           </div>
 
-          <div className="flex flex-col gap-y-2">
-            <Label>Image</Label>
-            <Input name="imageFile" type="file" required />
-          </div>
+          
+                        
+            <MyComponent /> {/* Use MyComponent here */}
+                    
+
 
           <Card>
             <CardHeader className="flex flex-col gap-y-5">
@@ -149,3 +156,4 @@ export default function DescriptionPage({ params }: PageProps) {
     </>
   );
 }
+

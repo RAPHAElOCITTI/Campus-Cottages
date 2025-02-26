@@ -27,7 +27,7 @@ model Hostel {
   rooms            String?
   Kitchen          String?
   bathrooms        String?
-  photo            String?
+  photos           String[]  // 👈 Change 'photo' to 'photos' (array)
   price            Int?
   UserId           String //Required
   createdAT        DateTime @default(now())

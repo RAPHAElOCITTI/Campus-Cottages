@@ -7,6 +7,8 @@ import { BookingSubmitButton } from "@/app/components/SubmitButtons";
 import { prisma } from "@/app/lib/db"
 import { useCountries } from "@/app/lib/getCountries";
 import { Button } from "@/components/ui/button";
+import { PhotoModal } from "@/app/components/PhotoModal";
+import { HostelPhotos } from "@/app/components/HostelPhotos";
 
 import { Separator } from "@/components/ui/separator";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
@@ -25,7 +27,7 @@ import { ResolvingMetadata } from 'next';
             id: hostelid,
         },
         select: {
-            photo: true,
+            photos: true,
             description: true,
             guests: true,
             rooms: true,
@@ -89,15 +91,8 @@ export default async function HostelRoute({
     const location = getCountryByValue(data?.location as string);
     return (
         <div className="w-[75%] mx-auto mt-10 mb-12">
-            <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
-            <div className="relative h-[550px]">
-                <Image 
-                alt="Image of Hostels"
-                src={`https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images/${data?.photo}`}
-                fill
-            className="rounded-lg h-full object-cover w-full"
-                />
-            </div>
+      <h1 className="font-medium text-2xl mb-5">{data?.title}</h1>
+      <HostelPhotos photos={data?.photos ?? []} title={data?.title ?? "Hostel"} />
             <div className="flex justify-between gap-x-24 mt-8">
                 <div className="w-2/3">
                     <h3 className="text-xl font-medium">

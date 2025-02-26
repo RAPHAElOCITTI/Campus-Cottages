@@ -253,6 +253,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "./lib/db";
 import { supabase } from "./lib/supabase";
 import { revalidatePath } from "next/cache";
+import MyComponent from "@/app/UploadHandling"
 
 //import path from "path";
 
@@ -324,8 +325,8 @@ export async function createCategoryPage(formData: FormData) {
 export async function CreateDescription(formData: FormData) {
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const price = formData.get("price");
-  const imageFile = formData.get("imageFile") as File;
+  const price = formData.get("price") as File;
+  const imageFiles = formData.getAll("imageFiles") as File[]; // Get all files
   const hostelId = formData.get("hostelId") as string;
 
   const guestNumber = formData.get("guest") as string;
@@ -335,19 +336,26 @@ export async function CreateDescription(formData: FormData) {
 
   
 
-  const { data: imageData } = await supabase.storage
-    .from("images")
-    .upload(`${imageFile.name}-${new Date()}`, 
-    imageFile, 
-    {
-        cacheControl: "2592000",
-        contentType: "image/png",
-    }
+  const imagePaths = await Promise.all(
+    imageFiles.map(async (imageFiles) => { // Iterate over the imageFiles array
+      const { data, error } = await supabase.storage
+      .from("images")
+      .upload(`${imageFiles.name}-${Date.now()}`, imageFiles, {
+          cacheControl: "2592000",
+          contentType: imageFiles.type, // Use the correct content type for each file
+        });
+  
+      if (error) {
+        console.error("Supabase upload error:", error);
+        throw new Error("Failed to upload image"); // Or handle the error appropriately
+      }
+  
+      return data.path; // Return the path of the uploaded image
+    })
   );
-
   const data = await prisma.hostel.update({
     where: {
-      id: hostelId,
+      id: hostelId
     },
     data: {
       title: title,
@@ -357,7 +365,7 @@ export async function CreateDescription(formData: FormData) {
       Kitchen: kitchenNumber,
       bathrooms: bathroomsNumber,
       guests: guestNumber,
-      photo: imageData?.path,
+      photos: { set:imagePaths}, // ✅ imageArray should be a string[]
       addedDescription: true,
     },
     

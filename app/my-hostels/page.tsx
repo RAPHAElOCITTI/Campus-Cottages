@@ -18,7 +18,7 @@ async function getData(userId: string) {
      select: {
         id: true,
         location: true,
-        photo: true,
+        photos: true,
         description: true,
         price: true,
         title: true,
@@ -63,7 +63,7 @@ export default async function MyHostels() {
                    {data.map((item) => (
                      <ListingCard 
                      key={item.id} 
-                     imagePath={item.photo as string}
+                     imagePaths={item.photos as string[]}
                      hostelId={item.id}
                      price={item.price as number}
                      description={item.description as string}

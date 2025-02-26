@@ -1,12 +1,4 @@
-type Hostel = {
-  id: string;
-  title: string;
-  photo: string;
-  price: number;
-  description: string;
-  location: string;
-  Favorite: Array<{ id: string }>;
-};
+
 
 import { Metadata } from 'next';
 import { MapFilterItems } from "./components/MapFilterItems";
@@ -18,6 +10,17 @@ import { NoItems } from "./components/Noitems";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Footer from "./components/CreationBottomBar";
 import { unstable_noStore as noStore } from "next/cache";
+
+
+type Hostel = {
+  id: string;
+  title: string;
+  photos: string[];
+  price: number;
+  description: string;
+  location: string;
+  Favorite: Array<{ id: string }>;
+};
 
 interface SearchParams {
   filter?: string;
@@ -47,43 +50,57 @@ async function getData({
 }): Promise<Hostel[]> {
   noStore();
   try {
+
+    // Await searchParams here
+    const resolvedSearchParams = await searchParams;
+    console.log("Resolved search params:", resolvedSearchParams);
+
     const data = await prisma.hostel.findMany({
       where: {
         addedCategory: true,
         addedLocation: true,
         addedDescription: true,
-        categoryName: searchParams?.filter ?? undefined,
-        location: searchParams?.location ?? undefined,
-        guests: searchParams?.guests ?? undefined,
-        rooms: searchParams?.room ?? undefined,
-        Kitchen: searchParams?.kitchen ?? undefined,
-        bathrooms: searchParams?.bathroom ?? undefined,
+        categoryName: resolvedSearchParams?.filter ?? undefined,
+        location: resolvedSearchParams?.location ?? undefined,
+        guests: resolvedSearchParams?.guests ?? undefined,
+        rooms: resolvedSearchParams?.room ?? undefined,
+        Kitchen: resolvedSearchParams?.kitchen ?? undefined,
+        bathrooms: resolvedSearchParams?.bathroom ?? undefined,
       },
       select: {
         title: true,
-        photo: true,
+        photos: true, //Fetching multiple photos
         id: true,
         price: true,
         description: true,
         location: true,
-        Favorite: {
-          where: {
-            userId: UserId ?? undefined,
-          },
+        Favorite: true,
+        Booking: UserId
+        ? {
+            where: {
+              userId: UserId,
+            },
+          }
+          : undefined,
         },
-      },
+      
     });
 
+    
     // Ensure all required fields are present and not null
     return data.map(hostel => ({
-      ...hostel,
+     
+     
+      id: hostel.id ?? '',
       title: hostel.title ?? '',
-      photo: hostel.photo ?? '',
+      photos: hostel.photos ? (Array.isArray(hostel.photos) ? hostel.photos : [hostel.photos]) :[],
       price: hostel.price ?? 0,
       description: hostel.description ?? '',
       location: hostel.location ?? '',
-      Favorite: hostel.Favorite || [],
+      Favorite: hostel.Favorite ? hostel.Favorite.map(fav => ({ id: fav.id })) : [], // Map to only id
     }));
+
+ 
   } catch (error) {
     console.error("Error fetching hostel data:", error);
     return [];
@@ -93,13 +110,19 @@ async function getData({
 }
 
 export default async function Hostel({
-  params, searchParams }: HostelProps) {
+  params, 
+  searchParams
+ }: HostelProps) {
   try {
+
+    // Await searchParams here as well
+    const resolvedSearchParams = await searchParams;
+
     return (
       <div className="container mx-auto px-5 lg:px-10">
         <MapFilterItems />
-        <Suspense key={searchParams?.filter} fallback={<SkeletonLoading />}>
-          <ShowItems searchParams={searchParams} />
+        <Suspense key={resolvedSearchParams?.filter} fallback={<SkeletonLoading />}>
+          <ShowItems searchParams={resolvedSearchParams} />
         </Suspense>
       </div>
     );
@@ -131,7 +154,7 @@ async function ShowItems({ searchParams }: { searchParams?: SearchParams }) {
                 key={item.id}
                 title={item.title}
                 description={item.description}
-                imagePath={item.photo}
+                imagePaths={item.photos}
                 location={item.location}
                 price={item.price}
                 userId={user?.id}
