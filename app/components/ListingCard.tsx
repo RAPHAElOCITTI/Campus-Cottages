@@ -7,8 +7,6 @@ import { AddToFavoriteButton, DeleteFromFavoriteButton } from "./SubmitButtons";
 import { addToFavorite, DeleteFromFavorite } from "../actions";
 import { useState } from "react";
 
-
-
 interface iAppProps {
     imagePaths: string[];
     description: string;
@@ -20,7 +18,6 @@ interface iAppProps {
     favoriteId: string;
     hostelId: string;
     pathName: string;
-    
 }
 
 export function ListingCard({
@@ -35,90 +32,113 @@ export function ListingCard({
     hostelId,
     pathName,
 }: iAppProps) {
-    const {getCountryByValue} = useCountries()
+    const { getCountryByValue } = useCountries();
     const country = getCountryByValue(location);
     const [currentImage, setCurrentImage] = useState(0);
+    const [isHovering, setIsHovering] = useState(false);
     
-    const handlePrevImage = () => {
-      setCurrentImage((prevIndex) =>
-          prevIndex === 0? imagePaths.length - 1: prevIndex - 1,
-      );
-  };
-
-  const handleNextImage = () => {
-      setCurrentImage((prevIndex) =>
-          prevIndex === imagePaths.length - 1? 0: prevIndex + 1,
-      );
-  };
-
-    console.log(country);
-
+    // Format price with commas
+    const formattedPrice = price.toLocaleString();
+    
     return (
-        <div className="border rounded-lg overflow-hidden shadow-md">
-            <div className="relative w-full h-56">
-            {imagePaths.length > 0 && ( // Check if there are any images
+        <div 
+            className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col h-full"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+        >
+            {/* Image Container */}
+            <div className="relative w-full aspect-[4/3] overflow-hidden">
+                {imagePaths.length > 0 ? (
                     <Image
-                        src={`https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images/${imagePaths[currentImage]}`} // Use currentImage index
-                        alt="Image of Hostel"
+                        src={`https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images/${imagePaths[currentImage]}`}
+                        alt={`Image of ${title}`}
                         fill
-                        className="rounded-lg h-full object-cover mb-3"
-                        />
-            )}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400">No image available</span>
+                    </div>
+                )}
 
-            {imagePaths.length > 1 && (
-          <>
-            <button 
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-200 p-2 rounded-full"
-              onClick={() => setCurrentImage((prev) => (prev === 0 ? imagePaths.length - 1 : prev - 1))}
-            >
-              ◀
-            </button>
-            <button 
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-200 p-2 rounded-full"
-              onClick={() => setCurrentImage((prev) => (prev === imagePaths.length - 1 ? 0 : prev + 1))}
-            >
-              ▶
-            </button>
-          </>
-        )}
+                {/* Image Navigation - Only visible on hover or touch devices */}
+                {imagePaths.length > 1 && (
+                    <>
+                        <button 
+                            className={`absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 rounded-full shadow text-gray-700 hover:bg-white transition-opacity duration-200 backdrop-blur-sm ${isHovering ? 'opacity-80' : 'opacity-0 md:opacity-0'}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentImage(prev => prev === 0 ? imagePaths.length - 1 : prev - 1);
+                            }}
+                            aria-label="Previous image"
+                        >
+                            ◀
+                        </button>
+                        <button 
+                            className={`absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 rounded-full shadow text-gray-700 hover:bg-white transition-opacity duration-200 backdrop-blur-sm ${isHovering ? 'opacity-80' : 'opacity-0 md:opacity-0'}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentImage(prev => prev === imagePaths.length - 1 ? 0 : prev + 1);
+                            }}
+                            aria-label="Next image"
+                        >
+                            ▶
+                        </button>
+                    </>
+                )}
 
-               
+                {/* Favorite Button */}
+                {userId && (
+                    <div className="z-10 absolute top-3 right-3">
+                        {isInFavoriteList ? (
+                            <form action={DeleteFromFavorite}>
+                                <input type="hidden" name="favoriteId" value={favoriteId} />
+                                <input type="hidden" name="userId" value={userId} />
+                                <input type="hidden" name="pathName" value={pathName} />
+                                <DeleteFromFavoriteButton />
+                            </form>
+                        ) : ( 
+                            <form action={addToFavorite}>
+                                <input type="hidden" name="hostelId" value={hostelId} />
+                                <input type="hidden" name="userId" value={userId} />
+                                <input type="hidden" name="pathName" value={pathName} />
+                                <AddToFavoriteButton />
+                            </form>
+                        )}
+                    </div>
+                )}
 
-            {userId && (
-                <div className="z-10 absolute top-2 right-2">
-                    {isInFavoriteList ? (
-                        <form action={DeleteFromFavorite}>
-                            <input type="hidden" name="favoriteId" value={favoriteId}/>
-                            <input type="hidden" name="userId" value={userId}/>
-                            <input type="hidden" name="pathName" value={pathName}/>
-                            <DeleteFromFavoriteButton />
-                        </form>
-
-                       ): ( 
-                        <form action={addToFavorite}>
-                            <input type="hidden" name="hostelId" value={hostelId}/>
-                            <input type="hidden" name="userId" value={userId}/>
-                            <input type="hidden" name="pathName" value={pathName}/>
-                            <AddToFavoriteButton />
-                        </form>
-                    )}
-
-                </div>
-            )}
+                {/* Image Counter Indicator */}
+                {imagePaths.length > 1 && (
+                    <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black/40 text-white text-xs py-1 px-2 rounded-full backdrop-blur-sm">
+                        {currentImage + 1}/{imagePaths.length}
+                    </div>
+                )}
             </div>
-            <Link href={`/hostel/${hostelId}`} className="mt-2">
-                <h3 className="font-medium text-base">
-                    {title}
-                </h3>
-               <p className="text-muted-foreground text-sm line-clamp-2">{description}</p> 
-               <p className="pt-2 text-muted-foreground">
-                <span className="font-medium text-black">Ush{price}</span> Semester
-               </p>
+
+            {/* Content */}
+            <Link href={`/hostel/${hostelId}`} className="flex flex-col flex-grow p-4">
+                <div className="flex items-start justify-between">
+                    <h3 className="font-medium text-lg text-gray-900 line-clamp-1 mb-1">
+                        {title}
+                    </h3>
+                </div>
+                
+                {/* Location */}
+                <div className="flex items-center text-sm text-gray-500 mb-2">
+                    <span className="line-clamp-1">📍 {country?.label || location}</span>
+                </div>
+                
+                <p className="text-gray-600 text-sm line-clamp-2 mb-3 flex-grow">{description}</p>
+                
+                <div className="mt-auto pt-3 border-t border-gray-100">
+                    <p className="flex items-baseline">
+                        <span className="font-semibold text-lg">USh {formattedPrice}</span>
+                        <span className="text-gray-500 text-sm ml-1">/ semester</span>
+                    </p>
+                </div>
             </Link>
-
         </div>
-        
     );
-
-  
 }

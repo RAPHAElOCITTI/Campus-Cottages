@@ -3,10 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
+import { useState } from "react";
 
 
 export function CreateSubmit() {
     const { pending } = useFormStatus();
+    const [isSubmitted, setIsSubmitted] = useState(false);
     return (
         <>
             {pending ? (
