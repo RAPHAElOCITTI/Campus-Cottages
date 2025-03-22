@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import DesktopLogo from '../../public/desktop.png'
-import MobileLogo from '../../public/mobile.webp'
+import MobileLogo from '../../public/mobile.png'
 import { UserNav } from "./UserNav";
 import { SearchModalComponent } from "./SearchComponent";
 

@@ -110,6 +110,9 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
               <span>·</span>
               <p>{data?.bathrooms} Bathrooms</p>
             </div>
+            <Separator className="my-2" />
+            <p className="text-2xl font-normal text-gray-800">{data?.price} USh / sem</p>
+
           </div>
 
           {/* Host Info */}
@@ -131,6 +134,8 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
           </div>
 
           <Separator className="my-2" />
+
+          
 
           {/* Category */}
           <CategoryShowcase categoryName={data?.categoryName as string} />

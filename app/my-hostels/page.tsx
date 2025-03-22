@@ -22,6 +22,7 @@ async function getData(userId: string) {
         description: true,
         price: true,
         title: true,
+        UserId: true, // Include hostel owner's ID for consistency
         Favorite: {
             where: {
                 userId: userId,
@@ -36,6 +37,14 @@ async function getData(userId: string) {
     return data;
 }
 
+// Fetch the user's role to enforce Hostel-Owner restriction
+async function getUserRole(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    return user?.role;
+  }
 
 export default async function MyHostels() {
      const {getUser} = getKindeServerSession();
@@ -44,6 +53,21 @@ export default async function MyHostels() {
     if(!user) {
         return redirect("/");
     }
+
+    // Fetch the user's role
+  const userRole = await getUserRole(user.id);
+
+  // Restrict access to Hostel-Owners only
+  if (userRole !== "HOSTEL_OWNER") {
+    return (
+      <section className="container mx-auto px-5 lg:px-10 mt-10">
+        <h2 className="text-2xl font-semibold tracking-tight">Your Hostels</h2>
+        <p className="mt-4 text-gray-600">
+          Only Hostel-Owners can view their listed hostels.
+        </p>
+      </section>
+    );
+  }
 
     const data = await getData(user.id);
     return (
@@ -73,10 +97,12 @@ export default async function MyHostels() {
                      pathName="/my-hostels"
                      favoriteId={item.Favorite[0]?.id}
                      isInFavoriteList={item.Favorite.length > 0 ? true : false}
+                     userRole={userRole} // Pass the user's role
+                     hostelUserId={item.UserId as string} // Pass the hostel owner's ID
                      />
                    ))} 
                 </div>
             )}
         </section>
-    )
+    );
 }

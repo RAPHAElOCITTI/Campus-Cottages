@@ -6,7 +6,11 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-  
+}
+
+enum UserRole {
+  STUDENT
+  HOSTEL_OWNER
 }
 
 model User {
@@ -15,6 +19,7 @@ model User {
   email        String
   firstName    String
   lastName     String
+  role         UserRole @default(STUDENT)
   Hostel       Hostel[]
   Favorite     Favorite[]
   Booking      Booking[]
@@ -27,9 +32,9 @@ model Hostel {
   rooms            String?
   Kitchen          String?
   bathrooms        String?
-  photos           String[]  // 👈 Change 'photo' to 'photos' (array)
+  photos           String[]
   price            Int?
-  UserId           String //Required
+  UserId           String
   createdAT        DateTime @default(now())
   addedCategory    Boolean  @default(false)
   addedDescription Boolean  @default(false)
@@ -38,31 +43,26 @@ model Hostel {
   description      String?
   location         String?
   User             User?    @relation(fields: [UserId], references: [id])
-  Favorite         Favorite[] // One-to-many relationship
+  Favorite         Favorite[]
   Booking          Booking[]
 }
 
-
-
 model Favorite {
-  id String @id @default(uuid())
-  User     User?   @relation(fields: [userId], references: [id]) // Optional: Favorite belongs to a user
+  id       String   @id @default(uuid())
+  User     User?    @relation(fields: [userId], references: [id])
   userId   String?
-  hostel   Hostel?  @relation(fields: [hostelId], references: [id]) // Link back to Hostel
-  hostelId String?    // Foreign key for Hostel
-  
+  hostel   Hostel?  @relation(fields: [hostelId], references: [id])
+  hostelId String?
   createAt DateTime @default(now())
 }
 
 model Booking {
-  id String @id @default(uuid())
-
+  id        String   @id @default(uuid())
   startDate DateTime
   endDate   DateTime
   createdAt DateTime @default(now())
-
-  User      User? @relation(fields: [userId], references: [id])
+  User      User?    @relation(fields: [userId], references: [id])
   userId    String?
-  Hostel    Hostel? @relation(fields: [hostelId], references: [id])
+  Hostel    Hostel?  @relation(fields: [hostelId], references: [id])
   hostelId  String?
 }

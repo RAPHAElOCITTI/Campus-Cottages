@@ -254,142 +254,147 @@ import { prisma } from "./lib/db";
 import { supabase } from "./lib/supabase";
 import { revalidatePath } from "next/cache";
 import MyComponent from "@/app/UploadHandling"
-
-//import path from "path";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export async function createcampuscottagesHostel({ userId }: { userId: string }) {
+  // Check user's role
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+
+  if (user?.role !== "HOSTEL_OWNER") {
+    throw new Error("Only Hostel-Owners can create hostel listings.");
+  }
+
   const data = await prisma.hostel.findFirst({
-    where: {
-      UserId: userId,
-    },
-    orderBy: {
-      createdAT: "desc",
-    },
+    where: { UserId: userId },
+    orderBy: { createdAT: "desc" },
   });
 
   if (data === null) {
     const data = await prisma.hostel.create({
-      data: {
-        UserId: userId,
-      },
+      data: { UserId: userId },
     });
-
     return redirect(`/create/${data.id}/structure`);
-  } else if (
-    !data.addedCategory &&
-    !data.addedDescription &&
-    !data.addedLocation
-  ) {
+  } else if (!data.addedCategory && !data.addedDescription && !data.addedLocation) {
     return redirect(`/create/${data.id}/structure`);
   } else if (data.addedCategory && !data.addedDescription) {
     return redirect(`/create/${data.id}/description`);
-  } else if (
-    data.addedCategory &&
-    data.addedDescription &&
-    !data.addedLocation
-  ) {
+  } else if (data.addedCategory && data.addedDescription && !data.addedLocation) {
     return redirect(`/create/${data.id}/address`);
-  } else if (
-    data.addedCategory &&
-    data.addedDescription &&
-    data.addedLocation
-  ) {
+  } else {
     const data = await prisma.hostel.create({
-      data: {
-        UserId: userId,
-      },
+      data: { UserId: userId },
     });
-
     return redirect(`/create/${data.id}/structure`);
   }
 }
 
 export async function createCategoryPage(formData: FormData) {
-  const categoryName = formData.get("categoryName") as string;
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   const hostelId = formData.get("hostelId") as string;
-  const data = await prisma.hostel.update({
-    where: {
-      id: hostelId,
-    },
-    data: {
-      categoryName: categoryName,
-      addedCategory: true,
-    },
-    
+
+  // Check ownership
+  const hostel = await prisma.hostel.findUnique({
+    where: { id: hostelId },
+    select: { UserId: true },
   });
-  console.log(data);
+
+  if (!hostel || hostel.UserId !== user?.id) {
+    throw new Error("You are not authorized to update this listing.");
+  }
+
+  const categoryName = formData.get("categoryName") as string;
+  await prisma.hostel.update({
+    where: { id: hostelId },
+    data: { categoryName: categoryName, addedCategory: true },
+  });
 
   return redirect(`/create/${hostelId}/description`);
 }
 
 export async function CreateDescription(formData: FormData) {
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const price = formData.get("price") as File;
-  const imageFiles = formData.getAll("imageFiles") as File[]; // Get all files
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   const hostelId = formData.get("hostelId") as string;
 
+  // Check ownership
+  const hostel = await prisma.hostel.findUnique({
+    where: { id: hostelId },
+    select: { UserId: true },
+  });
+
+  if (!hostel || hostel.UserId !== user?.id) {
+    throw new Error("You are not authorized to update this listing.");
+  }
+
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const price = formData.get("price") as string; // Corrected from File to string
+  const imageFiles = formData.getAll("imageFiles") as File[];
   const guestNumber = formData.get("guest") as string;
   const roomNumber = formData.get("room") as string;
-  const kitchenNumber = formData.get('kitchen') as string;
+  const kitchenNumber = formData.get("kitchen") as string;
   const bathroomsNumber = formData.get("bathroom") as string;
 
-  
-
   const imagePaths = await Promise.all(
-    imageFiles.map(async (imageFiles) => { // Iterate over the imageFiles array
+    imageFiles.map(async (imageFile) => {
       const { data, error } = await supabase.storage
-      .from("images")
-      .upload(`${imageFiles.name}-${Date.now()}`, imageFiles, {
+        .from("images")
+        .upload(`${imageFile.name}-${Date.now()}`, imageFile, {
           cacheControl: "2592000",
-          contentType: imageFiles.type, // Use the correct content type for each file
+          contentType: imageFile.type,
         });
-  
+
       if (error) {
         console.error("Supabase upload error:", error);
-        throw new Error("Failed to upload image"); // Or handle the error appropriately
+        throw new Error("Failed to upload image");
       }
-  
-      return data.path; // Return the path of the uploaded image
+
+      return data.path;
     })
   );
-  const data = await prisma.hostel.update({
-    where: {
-      id: hostelId
-    },
+
+  await prisma.hostel.update({
+    where: { id: hostelId },
     data: {
-      title: title,
-      description: description,
+      title,
+      description,
       price: Number(price),
       rooms: roomNumber,
       Kitchen: kitchenNumber,
       bathrooms: bathroomsNumber,
       guests: guestNumber,
-      photos: { set:imagePaths}, // ✅ imageArray should be a string[]
+      photos: { set: imagePaths },
       addedDescription: true,
     },
-    
   });
-
-  console.log(data);
 
   return redirect(`/create/${hostelId}/address`);
 }
 
 export async function createLocation(formData: FormData) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   const hostelId = formData.get("hostelId") as string;
-  const countryValue = formData.get("countryValue") as string;
-  const data = await prisma.hostel.update({
-    where: {
-      id: hostelId,
-    },
-    data: {
-      addedLocation: true,
-      location: countryValue,
-    },
+
+  // Check ownership
+  const hostel = await prisma.hostel.findUnique({
+    where: { id: hostelId },
+    select: { UserId: true },
   });
 
-  console.log(data);
+  if (!hostel || hostel.UserId !== user?.id) {
+    throw new Error("You are not authorized to update this listing.");
+  }
+
+  const countryValue = formData.get("countryValue") as string;
+  await prisma.hostel.update({
+    where: { id: hostelId },
+    data: { addedLocation: true, location: countryValue },
+  });
 
   return redirect("/");
 }
@@ -399,14 +404,9 @@ export async function addToFavorite(formData: FormData) {
   const userId = formData.get("userId") as string;
   const pathName = formData.get("pathName") as string;
 
-  const data = await prisma.favorite.create({
-    data: {
-      hostelId: hostelId,
-      userId: userId,
-    },
+  await prisma.favorite.create({
+    data: { hostelId: hostelId, userId: userId },
   });
-
-  console.log(data);
 
   revalidatePath(pathName);
 }
@@ -415,17 +415,10 @@ export async function DeleteFromFavorite(formData: FormData) {
   const favoriteId = formData.get("favoriteId") as string;
   const pathName = formData.get("pathName") as string;
   const userId = formData.get("userId") as string;
-  
 
-  const data = await prisma.favorite.delete({
-    where: {
-      id: favoriteId,
-      userId: userId,
-    },
-    
+  await prisma.favorite.delete({
+    where: { id: favoriteId, userId: userId },
   });
-
-  console.log(data);
 
   revalidatePath(pathName);
 }
@@ -436,33 +429,35 @@ export async function createBooking(formData: FormData) {
   const startDate = formData.get("startDate") as string;
   const endDate = formData.get("endDate") as string;
 
-   // Convert startDate and endDate to JavaScript Date objects
-   const parsedStartDate = new Date(startDate);
-   const parsedEndDate = new Date(endDate);
- 
-   // Validate date conversion
-   if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
-     throw new Error("Invalid date format. Ensure startDate and endDate are valid ISO-8601 strings.");
-   }
- 
-   // Ensure startDate is before endDate
-   if (parsedStartDate >= parsedEndDate) {
-     throw new Error("startDate must be earlier than endDate.");
-   }
+  // Check user's role
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
 
+  if (user?.role !== "STUDENT") {
+    throw new Error("Only Students can book hostels.");
+  }
 
- const data = await prisma.booking.create({
-     data: {
-         userId: userId,
-         endDate: parsedEndDate,
-         startDate:  parsedStartDate,
-         hostelId: hostelId,
-     },
- });
+  const parsedStartDate = new Date(startDate);
+  const parsedEndDate = new Date(endDate);
 
+  if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+    throw new Error("Invalid date format.");
+  }
 
- console.log(data);
+  if (parsedStartDate >= parsedEndDate) {
+    throw new Error("startDate must be earlier than endDate.");
+  }
 
- return redirect("/");
-} 
- 
+  await prisma.booking.create({
+    data: {
+      userId: userId,
+      endDate: parsedEndDate,
+      startDate: parsedStartDate,
+      hostelId: hostelId,
+    },
+  });
+
+  return redirect("/");
+}

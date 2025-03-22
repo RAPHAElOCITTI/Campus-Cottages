@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Heart, Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { useState } from "react";
-
+// Adjust the import based on your project structure
+import { PaymentService } from 'daraza';
 
 export function CreateSubmit() {
     const { pending } = useFormStatus();
@@ -83,6 +84,41 @@ export function DeleteFromFavoriteButton() {
 
 export function BookingSubmitButton() {
     const { pending } = useFormStatus();
+
+    const handlePayment = async () => {
+        const paymentService = new PaymentService({
+            apiKey: 'YOUR_API_KEY' // Replace with your actual API key
+        });
+
+        try {
+            // Validate phone number and amount
+            const validatedPhone = paymentService.validatePhoneNumber('762038491'); // Replace with the actual phone number
+            const validatedAmount = paymentService.validateAmount(1000); // Replace with the actual amount
+
+            // Prepare payment data
+            const paymentData = {
+                method: 1,
+                amount: validatedAmount,
+                phone: validatedPhone,
+                note: 'Payment for reservation'
+            };
+
+            // Request to pay
+            const response = await paymentService.requestToPay(paymentData);
+
+            if (response.code === 'Success') {
+                console.log('Payment successful:', response);
+                // Handle successful payment (e.g., redirect to a success page)
+            } else {
+                console.error('Payment failed:', response.details);
+                // Handle payment failure (e.g., show an error message)
+            }
+        } catch (error) {
+            console.error('Payment error:', error);
+            // Handle payment error (e.g., show an error message)
+        }
+    };
+
     return (
         <>
          {pending ? (
