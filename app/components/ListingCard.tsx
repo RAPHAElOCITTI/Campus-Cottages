@@ -139,7 +139,7 @@ export function ListingCard({
 
         {userRole === "STUDENT" && (
           <Link
-            href={`/book/${hostelId}`}
+            href={`/hostel/${hostelId}`}
             className="mt-2 block text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
           >
             Book Now
