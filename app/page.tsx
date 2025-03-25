@@ -118,7 +118,7 @@ export default async function Hostel({ params, searchParams }: HostelProps) {
       <div className="container mx-auto px-5 lg:px-10">
         {userRole === "HOSTEL_OWNER" && (
           <Link href="/create" className="block mb-4 text-blue-600 hover:underline">
-            List a Hostel
+           
           </Link>
         )}
         <MapFilterItems />

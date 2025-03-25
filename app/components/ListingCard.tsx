@@ -148,8 +148,8 @@ export function ListingCard({
 
         {userRole === "HOSTEL_OWNER" && userId === hostelUserId && (
           <Link
-            href={`/edit/${hostelId}`}
-            className="mt-2 block text-center bg-green-500 text-white py-2 rounded hover:bg-green-600"
+            href={`/create/${hostelId}`}
+            className="mt-2 block text-center bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
           >
             Edit Listing
           </Link>
