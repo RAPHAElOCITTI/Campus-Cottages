@@ -127,7 +127,7 @@ export function BookingSubmitButton() {
         </Button>
 
          ): (
-            <Button className="w-full" type="submit">
+            <Button className="w-full" type="submit" onClick={handlePayment}>
                             Make a Reservation!
             </Button>
          )}
