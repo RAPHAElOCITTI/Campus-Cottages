@@ -136,12 +136,16 @@ export default function AddressRoute({ params }: { params: Promise<{ id: string 
               <span className="font-semibold text-green-600">Location Selected ✓</span><br/>
               Latitude: {latitude.toFixed(5)}, Longitude: {longitude.toFixed(5)}
               <div className="mt-1 text-xs text-gray-500">Click elsewhere on the map to adjust location</div>
+              <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-1 rounded border border-blue-100">
+                <span className="font-medium">Note:</span> The exact place name near this pin will be displayed to students on your listing.
+              </div>
             </div>
           )}
           {!latitude && !longitude && countryValue && (
             <div className="absolute bottom-2 left-2 bg-white p-2 rounded shadow-md text-sm">
               <span className="font-semibold text-amber-600">Location Required</span><br/>
-              Please click on the map to select the precise hostel location.
+              Please click on the map to select the precise hostel location.<br/>
+              <span className="text-xs text-gray-600">The place name will be automatically determined.</span>
             </div>
           )}
           {!countryValue && (

@@ -131,8 +131,16 @@ export function ListingCard({
           <div className="flex items-start justify-between">
             <h3 className="font-medium text-lg text-gray-900 line-clamp-1 mb-1">{title}</h3>
           </div>
-          <div className="flex items-center text-sm text-gray-500 mb-2">
-            <span className="line-clamp-1">📍 {location_name || (latitude && longitude ? 'Precise Location' : 'Location Available')}</span>
+          <div className="flex items-center text-sm mb-2">
+            {location_name ? (
+              <span className="line-clamp-1 bg-green-50 text-green-700 px-2 py-1 rounded-full border border-green-100 font-medium flex items-center">
+                <span className="mr-1">📍</span> {location_name}
+              </span>
+            ) : (
+              <span className="line-clamp-1 text-gray-500">
+                <span className="mr-1">📍</span> {latitude && longitude ? 'Precise Location' : 'Location Available'}
+              </span>
+            )}
           </div>
           <p className="text-gray-600 text-sm line-clamp-2 mb-3 flex-grow">{description}</p>
           <div className="mt-auto pt-3 border-t border-gray-100">

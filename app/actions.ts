@@ -415,27 +415,40 @@ export async function createLocation(formData: FormData) {
     
     // Try to get location name based on coordinates
     try {
-      // First try to use reverse geocoding to get area/district name
-      const { getCountryByValue } = require("./lib/getCountries").useCountries();
-      const { getDistrictByCoordinates } = require("./lib/getDistricts").useDistricts();
+      // Import the necessary functions
+      const { useCountries } = require("./lib/getCountries");
+      const { useDistricts } = require("./lib/getDistricts");
       
-      // Get country info
-      const country = getCountryByValue(countryValue);
+      const { getCountryByValue } = useCountries();
+      const { getLocationNameFromCoordinates } = useDistricts();
       
-      // Try to get district/area name
-      const district = await getDistrictByCoordinates(lat, lng);
+      // Get a detailed location name using our enhanced function
+      const locationName = await getLocationNameFromCoordinates(lat, lng, countryValue);
       
-      // Create a user-friendly location name
-      if (district) {
-        updateData.location_name = `${district}, ${country?.label || ''}`;
+      // Set the location name in our update data
+      if (locationName) {
+        updateData.location_name = locationName;
       } else {
-        // Fallback to just using the country name
+        // Get country info as fallback
+        const country = getCountryByValue(countryValue);
+        // Fallback to a generic location name with country reference
         updateData.location_name = `${country?.label || 'Unknown location'}`;
       }
     } catch (error) {
       console.error("Error getting location name:", error);
-      // Fallback: Use coordinates as location name
+      // Fallback: Use coordinates as location name with better formatting
       updateData.location_name = `Location at ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    }
+  } else {
+    // If no coordinates provided, set a generic location name
+    try {
+      const { useCountries } = require("./lib/getCountries");
+      const { getCountryByValue } = useCountries();
+      const country = getCountryByValue(countryValue);
+      updateData.location_name = country?.label || 'Unknown location';
+    } catch (error) {
+      console.error("Error getting country name:", error);
+      updateData.location_name = 'Location unavailable';
     }
   }
   
