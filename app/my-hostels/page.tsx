@@ -20,6 +20,7 @@ async function getData(userId: string) {
         location: true,
         latitude: true,
         longitude: true,
+        location_name: true, // Add location_name
         photos: true,
         description: true,
         price: true,
@@ -96,6 +97,7 @@ export default async function MyHostels() {
                      title={item.title as string}
                      latitude={item.latitude}
                      longitude={item.longitude}
+                     location_name={item.location_name}
                      userId={user.id}
                      pathName="/my-hostels"
                      favoriteId={item.Favorite[0]?.id}

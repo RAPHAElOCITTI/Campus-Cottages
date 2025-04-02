@@ -25,6 +25,11 @@ const nextConfig= {
       }
     ],
    },
+   
+  // Configure for dynamic routes
+  experimental: {
+    serverActions: true
+  },
 
 
 

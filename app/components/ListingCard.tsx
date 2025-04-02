@@ -13,6 +13,7 @@ interface iAppProps {
  // location: string; // No longer need string location
   latitude: number | null;  // Receive latitude
   longitude: number | null; // Receive longitude
+  location_name: string | null; // Add location_name
   price: number;
   title: string;
   userId: string | undefined;
@@ -31,6 +32,7 @@ export function ListingCard({
    // location, // No longer needed
   latitude,
   longitude,
+  location_name,
   price,
   userId,
   favoriteId,
@@ -130,7 +132,7 @@ export function ListingCard({
             <h3 className="font-medium text-lg text-gray-900 line-clamp-1 mb-1">{title}</h3>
           </div>
           <div className="flex items-center text-sm text-gray-500 mb-2">
-            <span className="line-clamp-1">📍 {latitude && longitude ? `Precise Location` : `Location Available`}</span>
+            <span className="line-clamp-1">📍 {location_name || (latitude && longitude ? 'Precise Location' : 'Location Available')}</span>
           </div>
           <p className="text-gray-600 text-sm line-clamp-2 mb-3 flex-grow">{description}</p>
           <div className="mt-auto pt-3 border-t border-gray-100">

@@ -35,6 +35,7 @@ async function getData(hostelid: string) {
       location: true,
       latitude: true,
       longitude: true,
+      location_name: true, // Added location_name
       Booking: {
         where: {
           hostelId: hostelid,
@@ -103,6 +104,11 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
             <h3 className="text-2xl font-medium text-gray-800">
               {location?.flag} {location?.label} / {location?.region}
             </h3>
+            {data?.location_name && (
+              <div className="bg-green-50 border border-green-200 rounded-md px-3 py-2 mt-2 inline-block">
+                <span className="text-sm font-medium text-green-700">📍 {data.location_name}</span>
+              </div>
+            )}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500 mt-2">
               <p>{data?.guests} Guests</p>
               <span>·</span>

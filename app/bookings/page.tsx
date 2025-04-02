@@ -25,6 +25,7 @@ async function getData(userId: string) {
           location: true,
           latitude: true,
           longitude: true,
+          location_name: true,
           title: true,
           photos: true,
           description: true,
@@ -76,6 +77,7 @@ export default async function BookingRoute() {
               description={item.Hostel?.description as string}
               latitude={item.Hostel?.latitude}
               longitude={item.Hostel?.longitude}
+              location_name={item.Hostel?.location_name}
               pathName="/bookings"
               hostelId={item.Hostel?.id as string}
               imagePaths={item.Hostel?.photos as string[]}

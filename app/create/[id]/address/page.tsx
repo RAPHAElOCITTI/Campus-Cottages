@@ -27,15 +27,23 @@ const ICON = icon({
   });
   
   
-  function LocationPicker({ setLatitude, setLongitude }: { setLatitude: (lat: number) => void, setLongitude: (lng: number) => void }) {
-    useMapEvents({
-      click: (e) => {
-        setLatitude(e.latlng.lat);
-        setLongitude(e.latlng.lng);
-      },
-    });
-    return null;
-  }
+  function LocationPicker({ 
+  setLatitude, 
+  setLongitude 
+}: { 
+  setLatitude: (lat: number) => void, 
+  setLongitude: (lng: number) => void 
+}) {
+  useMapEvents({
+    click: async (e) => {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      setLatitude(lat);
+      setLongitude(lng);
+    },
+  });
+  return null;
+}
 
 export default function AddressRoute({ params }: { params: Promise<{ id: string }> }){
     const {getAllCountries} = useCountries(); //No longer needed

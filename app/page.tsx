@@ -19,6 +19,7 @@ type Hostel = {
   location: string;
   latitude: number | null; // Added latitude
   longitude: number | null; // Added longitude
+  location_name: string | null; // Added location_name
   Favorite: Array<{ id: string }>;
   UserId: string;
 };
@@ -37,8 +38,10 @@ interface HostelProps {
   searchParams?: any;
 }
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
-  title: "Hostel Listings",
+  title: "Campus Cottages",
   description: "View our available hostels",
 };
 
@@ -59,18 +62,17 @@ async function getData({
 }): Promise<Hostel[]> {
   noStore();
   try {
-    const resolvedSearchParams = await searchParams;
     const data = await prisma.hostel.findMany({
       where: {
         addedCategory: true,
         addedLocation: true,
         addedDescription: true,
-        categoryName: resolvedSearchParams?.filter ?? undefined,
-        location: resolvedSearchParams?.location ?? undefined, 
-        guests: resolvedSearchParams?.guests ?? undefined,
-        rooms: resolvedSearchParams?.room ?? undefined,
-        Kitchen: resolvedSearchParams?.kitchen ?? undefined,
-        bathrooms: resolvedSearchParams?.bathroom ?? undefined,
+        categoryName: searchParams?.filter ?? undefined,
+        location: searchParams?.location ?? undefined, 
+        guests: searchParams?.guests ?? undefined,
+        rooms: searchParams?.room ?? undefined,
+        Kitchen: searchParams?.kitchen ?? undefined,
+        bathrooms: searchParams?.bathroom ?? undefined,
       },
       select: {
         title: true,
@@ -82,6 +84,7 @@ async function getData({
         // Selecting the newly added latitude and longitude
         latitude: true, // Added latitude
         longitude: true, // Added longitude
+        location_name: true, // Added location_name
         UserId: true,
         Favorite: UserId
           ? {
@@ -105,6 +108,7 @@ async function getData({
       location: hostel.location ?? "",
       latitude: hostel.latitude ?? null, // Added latitude
       longitude: hostel.longitude ?? null, // Added longitude
+      location_name: hostel.location_name ?? null, // Added location_name
       Favorite: hostel.Favorite ? hostel.Favorite.map((fav) => ({ id: fav.id })) : [],
       UserId: hostel.UserId,
     }));
@@ -119,7 +123,6 @@ export default async function Hostel({ params, searchParams }: HostelProps) {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
     const userRole = user ? await getUserRole(user.id) : null;
-    const resolvedSearchParams = await searchParams;
 
     return (
       <div className="container mx-auto px-5 lg:px-10">
@@ -129,8 +132,8 @@ export default async function Hostel({ params, searchParams }: HostelProps) {
           </Link>
         )}
         <MapFilterItems />
-        <Suspense key={resolvedSearchParams?.filter} fallback={<SkeletonLoading />}>
-          <ShowItems searchParams={resolvedSearchParams} userRole={userRole} userId={user?.id} />
+        <Suspense key={searchParams?.filter} fallback={<SkeletonLoading />}>
+          <ShowItems searchParams={searchParams} userRole={userRole} userId={user?.id} />
         </Suspense>
       </div>
     );
@@ -169,6 +172,7 @@ async function ShowItems({
                 imagePaths={item.photos}
                 latitude={item.latitude}       // Pass latitude to ListingCard
                 longitude={item.longitude}      // Pass longitude to ListingCard
+                location_name={item.location_name} // Pass location_name to ListingCard
                 price={item.price}
                 userId={userId}
                 favoriteId={item.Favorite[0]?.id}

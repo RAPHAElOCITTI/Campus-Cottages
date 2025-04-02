@@ -24,6 +24,7 @@ async function getData(userId: string) {
           location: true,
           latitude: true,
           longitude: true,
+          location_name: true, // Added location_name
           description: true,
           UserId: true, // Include the hostel owner's ID for role-specific actions
         },
@@ -66,6 +67,7 @@ export default async function FavoriteRoute() {
               description={item.hostel?.description as string}
               latitude={item.hostel?.latitude}
               longitude={item.hostel?.longitude}
+              location_name={item.hostel?.location_name}
               pathName="/favorites"
               hostelId={item.hostel?.id as string}
               imagePaths={item.hostel?.photos as string[]}

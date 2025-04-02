@@ -400,18 +400,43 @@ export async function createLocation(formData: FormData) {
     location: string;
     latitude?: number;
     longitude?: number;
+    location_name?: string;
   } = { 
     addedLocation: true, 
     location: countryValue
   };
   
   // Only add latitude/longitude if they exist (prevents type errors)
-  if (latitudeValue) {
-    updateData.latitude = parseFloat(latitudeValue);
-  }
-  
-  if (longitudeValue) {
-    updateData.longitude = parseFloat(longitudeValue);
+  if (latitudeValue && longitudeValue) {
+    const lat = parseFloat(latitudeValue);
+    const lng = parseFloat(longitudeValue);
+    updateData.latitude = lat;
+    updateData.longitude = lng;
+    
+    // Try to get location name based on coordinates
+    try {
+      // First try to use reverse geocoding to get area/district name
+      const { getCountryByValue } = require("./lib/getCountries").useCountries();
+      const { getDistrictByCoordinates } = require("./lib/getDistricts").useDistricts();
+      
+      // Get country info
+      const country = getCountryByValue(countryValue);
+      
+      // Try to get district/area name
+      const district = await getDistrictByCoordinates(lat, lng);
+      
+      // Create a user-friendly location name
+      if (district) {
+        updateData.location_name = `${district}, ${country?.label || ''}`;
+      } else {
+        // Fallback to just using the country name
+        updateData.location_name = `${country?.label || 'Unknown location'}`;
+      }
+    } catch (error) {
+      console.error("Error getting location name:", error);
+      // Fallback: Use coordinates as location name
+      updateData.location_name = `Location at ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    }
   }
   
   // Update with all location data
