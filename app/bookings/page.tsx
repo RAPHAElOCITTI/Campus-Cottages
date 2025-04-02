@@ -23,6 +23,8 @@ async function getData(userId: string) {
         select: {
           id: true,
           location: true,
+          latitude: true,
+          longitude: true,
           title: true,
           photos: true,
           description: true,
@@ -72,7 +74,8 @@ export default async function BookingRoute() {
               key={`booking-${item.Hostel?.id}-${item?.id}`}
               title={item.Hostel?.title as string}
               description={item.Hostel?.description as string}
-              location={item.Hostel?.location as string}
+              latitude={item.Hostel?.latitude}
+              longitude={item.Hostel?.longitude}
               pathName="/bookings"
               hostelId={item.Hostel?.id as string}
               imagePaths={item.Hostel?.photos as string[]}

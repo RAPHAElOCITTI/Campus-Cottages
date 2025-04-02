@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCountries } from "../lib/getCountries";
+//import { useCountries } from "../lib/getCountries"; //No longer needed
 import { AddToFavoriteButton, DeleteFromFavoriteButton } from "./SubmitButtons";
 import { addToFavorite, DeleteFromFavorite } from "../actions";
 import { useState } from "react";
@@ -10,7 +10,9 @@ import { useState } from "react";
 interface iAppProps {
   imagePaths: string[];
   description: string;
-  location: string;
+ // location: string; // No longer need string location
+  latitude: number | null;  // Receive latitude
+  longitude: number | null; // Receive longitude
   price: number;
   title: string;
   userId: string | undefined;
@@ -26,7 +28,9 @@ export function ListingCard({
   title,
   description,
   imagePaths,
-  location,
+   // location, // No longer needed
+  latitude,
+  longitude,
   price,
   userId,
   favoriteId,
@@ -36,8 +40,8 @@ export function ListingCard({
   userRole,
   hostelUserId,
 }: iAppProps) {
-  const { getCountryByValue } = useCountries();
-  const country = getCountryByValue(location);
+   // const { getCountryByValue } = useCountries(); // No longer needed
+  // const country = getCountryByValue(location);  // No longer needed
   const [currentImage, setCurrentImage] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
 
@@ -126,7 +130,7 @@ export function ListingCard({
             <h3 className="font-medium text-lg text-gray-900 line-clamp-1 mb-1">{title}</h3>
           </div>
           <div className="flex items-center text-sm text-gray-500 mb-2">
-            <span className="line-clamp-1">📍 {country?.label || location}</span>
+            <span className="line-clamp-1">📍 {latitude && longitude ? `Precise Location` : `Location Available`}</span>
           </div>
           <p className="text-gray-600 text-sm line-clamp-2 mb-3 flex-grow">{description}</p>
           <div className="mt-auto pt-3 border-t border-gray-100">

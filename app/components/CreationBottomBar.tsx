@@ -3,14 +3,22 @@ import Link from "next/link";
 import { CreateSubmit } from "./SubmitButtons";
 import { ArrowUp, FacebookIcon, InstagramIcon, LinkedinIcon, Locate, Mail, Phone, TwitterIcon } from "lucide-react";
 
-export function CreateBottomBar() {
+interface CreateBottomBarProps {
+    disableSubmit?: boolean;
+    disableMessage?: string;
+}
+
+export function CreateBottomBar({ disableSubmit, disableMessage }: CreateBottomBarProps) {
     return (
         <div className="fixed w-full bottom-0 z-10 bg-white border-t h-24">
         <div className="flex items-centre justify-between mx-auto px-5 lg:px-10 h-full">
             <Button size="lg" asChild>
                <Link href="/">Cancel</Link>
             </Button>
-            <CreateSubmit />
+            {disableMessage && (
+                <div className="text-sm text-amber-600 mr-4">{disableMessage}</div>
+            )}
+            <CreateSubmit disabled={disableSubmit} />
         </div>
     </div>
     )

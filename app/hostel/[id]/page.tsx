@@ -33,6 +33,8 @@ async function getData(hostelid: string) {
       categoryName: true,
       price: true,
       location: true,
+      latitude: true,
+      longitude: true,
       Booking: {
         where: {
           hostelId: hostelid,
@@ -149,7 +151,11 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
 
           {/* Map */}
           <div className="rounded-lg overflow-hidden">
-            <HomeMap locationValue={location?.value as string} />
+            <HomeMap 
+              locationValue={location?.value as string}
+              latitude={data?.latitude}
+              longitude={data?.longitude} 
+            />
           </div>
         </div>
 

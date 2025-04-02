@@ -22,6 +22,8 @@ async function getData(userId: string) {
           Favorite: true, // Include all favorites for the hostel (though not filtered by user here)
           price: true,
           location: true,
+          latitude: true,
+          longitude: true,
           description: true,
           UserId: true, // Include the hostel owner's ID for role-specific actions
         },
@@ -62,7 +64,8 @@ export default async function FavoriteRoute() {
               key={`favorite-${item.hostel?.id}`}
               title={item.hostel?.title as string}
               description={item.hostel?.description as string}
-              location={item.hostel?.location as string}
+              latitude={item.hostel?.latitude}
+              longitude={item.hostel?.longitude}
               pathName="/favorites"
               hostelId={item.hostel?.id as string}
               imagePaths={item.hostel?.photos as string[]}

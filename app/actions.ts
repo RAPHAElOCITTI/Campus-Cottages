@@ -391,9 +391,33 @@ export async function createLocation(formData: FormData) {
   }
 
   const countryValue = formData.get("countryValue") as string;
+  const latitudeValue = formData.get("latitude") as string;
+  const longitudeValue = formData.get("longitude") as string;
+  
+  // Create the update data object - type safe approach
+  const updateData: {
+    addedLocation: boolean;
+    location: string;
+    latitude?: number;
+    longitude?: number;
+  } = { 
+    addedLocation: true, 
+    location: countryValue
+  };
+  
+  // Only add latitude/longitude if they exist (prevents type errors)
+  if (latitudeValue) {
+    updateData.latitude = parseFloat(latitudeValue);
+  }
+  
+  if (longitudeValue) {
+    updateData.longitude = parseFloat(longitudeValue);
+  }
+  
+  // Update with all location data
   await prisma.hostel.update({
     where: { id: hostelId },
-    data: { addedLocation: true, location: countryValue },
+    data: updateData,
   });
 
   return redirect("/");

@@ -42,6 +42,9 @@ model Hostel {
   categoryName     String?
   description      String?
   location         String?
+  // Added latitude and longitude for precise location
+  latitude       Float?
+  longitude      Float?
   User             User?    @relation(fields: [UserId], references: [id])
   Favorite         Favorite[]
   Booking          Booking[]

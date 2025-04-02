@@ -17,6 +17,8 @@ type Hostel = {
   price: number;
   description: string;
   location: string;
+  latitude: number | null; // Added latitude
+  longitude: number | null; // Added longitude
   Favorite: Array<{ id: string }>;
   UserId: string;
 };
@@ -64,7 +66,7 @@ async function getData({
         addedLocation: true,
         addedDescription: true,
         categoryName: resolvedSearchParams?.filter ?? undefined,
-        location: resolvedSearchParams?.location ?? undefined,
+        location: resolvedSearchParams?.location ?? undefined, 
         guests: resolvedSearchParams?.guests ?? undefined,
         rooms: resolvedSearchParams?.room ?? undefined,
         Kitchen: resolvedSearchParams?.kitchen ?? undefined,
@@ -77,6 +79,9 @@ async function getData({
         price: true,
         description: true,
         location: true,
+        // Selecting the newly added latitude and longitude
+        latitude: true, // Added latitude
+        longitude: true, // Added longitude
         UserId: true,
         Favorite: UserId
           ? {
@@ -98,6 +103,8 @@ async function getData({
       price: hostel.price ?? 0,
       description: hostel.description ?? "",
       location: hostel.location ?? "",
+      latitude: hostel.latitude ?? null, // Added latitude
+      longitude: hostel.longitude ?? null, // Added longitude
       Favorite: hostel.Favorite ? hostel.Favorite.map((fav) => ({ id: fav.id })) : [],
       UserId: hostel.UserId,
     }));
@@ -160,7 +167,8 @@ async function ShowItems({
                 title={item.title}
                 description={item.description}
                 imagePaths={item.photos}
-                location={item.location}
+                latitude={item.latitude}       // Pass latitude to ListingCard
+                longitude={item.longitude}      // Pass longitude to ListingCard
                 price={item.price}
                 userId={userId}
                 favoriteId={item.Favorite[0]?.id}

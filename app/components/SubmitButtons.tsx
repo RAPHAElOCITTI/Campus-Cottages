@@ -7,7 +7,11 @@ import { useState } from "react";
 // Adjust the import based on your project structure
 import { PaymentService } from 'daraza';
 
-export function CreateSubmit() {
+interface CreateSubmitProps {
+    disabled?: boolean;
+}
+
+export function CreateSubmit({ disabled }: CreateSubmitProps) {
     const { pending } = useFormStatus();
     const [isSubmitted, setIsSubmitted] = useState(false);
     return (
@@ -18,7 +22,12 @@ export function CreateSubmit() {
                     Please wait 
                 </Button>
             ):(
-                <Button type="submit" size="lg" >
+                <Button 
+                    type="submit" 
+                    size="lg" 
+                    disabled={disabled}
+                    title={disabled ? "Required fields are missing" : "Continue to next step"}
+                >
                     Next
                 </Button>
             )}
