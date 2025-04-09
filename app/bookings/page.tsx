@@ -1,5 +1,6 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ListingCard } from "../components/ListingCard";
+import { BookingDetails } from "../components/BookingDetails";
 import { NoItems } from "../components/Noitems";
 import { prisma } from "../lib/db";
 import { redirect } from "next/navigation";
@@ -19,6 +20,9 @@ async function getData(userId: string) {
     where: { userId: userId },
     select: {
       id: true,
+      startDate: true,
+      endDate: true,
+      createdAt: true,
       Hostel: {
         select: {
           id: true,
@@ -29,11 +33,27 @@ async function getData(userId: string) {
           title: true,
           photos: true,
           description: true,
-          price: true,
           Favorite: true,
           Booking: {
             where: { userId: userId },
           },
+          RoomCategory: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+              availableRooms: true,
+              totalRooms: true,
+            },
+          },
+        },
+      },
+      RoomCategory: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          description: true,
         },
       },
     },
@@ -69,24 +89,16 @@ export default async function BookingRoute() {
           description="Please make reservations to see them..."
         />
       ) : (
-        <div className="grid lg:grid-cols-4 sm:grid-cols-2 md:grid-cols-3 grid-cols-1 gap-8 mt-8">
+        <div className="grid lg:grid-cols-3 sm:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-6 mt-8">
           {data.map((item) => (
-            <ListingCard
-              key={`booking-${item.Hostel?.id}-${item?.id}`}
-              title={item.Hostel?.title as string}
-              description={item.Hostel?.description as string}
-              latitude={item.Hostel?.latitude}
-              longitude={item.Hostel?.longitude}
-              location_name={item.Hostel?.location_name}
-              pathName="/bookings"
-              hostelId={item.Hostel?.id as string}
-              imagePaths={item.Hostel?.photos as string[]}
-              price={item.Hostel?.price as number}
-              userId={user.id}
-              favoriteId={item.Hostel?.Favorite[0]?.id as string}
-              isInFavoriteList={(item.Hostel?.Favorite.length as number) > 0}
-              userRole={userRole}
-              hostelUserId={item.Hostel?.id as string} // Simplified; actual UserId not needed here
+            <BookingDetails
+              key={`booking-${item.id}`}
+              startDate={item.startDate}
+              endDate={item.endDate}
+              hostelTitle={item.Hostel?.title}
+              roomCategoryName={item.RoomCategory?.name}
+              roomCategoryPrice={item.RoomCategory?.price}
+              createdAt={item.createdAt}
             />
           ))}
         </div>

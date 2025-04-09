@@ -7,6 +7,12 @@ import { AddToFavoriteButton, DeleteFromFavoriteButton } from "./SubmitButtons";
 import { addToFavorite, DeleteFromFavorite } from "../actions";
 import { useState } from "react";
 
+interface RoomCategoryInfo {
+  name: string;
+  price: number;
+  availableRooms: number;
+}
+
 interface iAppProps {
   imagePaths: string[];
   description: string;
@@ -14,7 +20,8 @@ interface iAppProps {
   latitude: number | null;  // Receive latitude
   longitude: number | null; // Receive longitude
   location_name: string | null; // Add location_name
-  price: number;
+  price?: number;
+  roomCategories?: RoomCategoryInfo[];
   title: string;
   userId: string | undefined;
   isInFavoriteList: boolean;
@@ -34,6 +41,7 @@ export function ListingCard({
   longitude,
   location_name,
   price,
+  roomCategories,
   userId,
   favoriteId,
   isInFavoriteList,
@@ -47,7 +55,27 @@ export function ListingCard({
   const [currentImage, setCurrentImage] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
 
-  const formattedPrice = price.toLocaleString();
+  // Determine price display based on room categories if available
+  let priceDisplay = "";
+  if (roomCategories && roomCategories.length > 0) {
+    const minPrice = Math.min(...roomCategories.map(c => c.price));
+    const maxPrice = Math.max(...roomCategories.map(c => c.price));
+    
+    if (minPrice === maxPrice) {
+      priceDisplay = `USh ${minPrice.toLocaleString()}`;
+    } else {
+      priceDisplay = `USh ${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()}`;
+    }
+  } else if (price) {
+    priceDisplay = `USh ${price.toLocaleString()}`;
+  } else {
+    priceDisplay = "Price on request";
+  }
+  
+  // Get room availability information
+  const totalAvailableRooms = roomCategories 
+    ? roomCategories.reduce((sum, category) => sum + category.availableRooms, 0)
+    : null;
 
   return (
     <div
@@ -145,9 +173,16 @@ export function ListingCard({
           <p className="text-gray-600 text-sm line-clamp-2 mb-3 flex-grow">{description}</p>
           <div className="mt-auto pt-3 border-t border-gray-100">
             <p className="flex items-baseline">
-              <span className="font-semibold text-lg">USh {formattedPrice}</span>
+              <span className="font-semibold text-lg">{priceDisplay}</span>
               <span className="text-gray-500 text-sm ml-1">/ semester</span>
             </p>
+            {roomCategories && (
+              <p className="text-sm text-gray-600 mt-1">
+                {totalAvailableRooms === 0 
+                  ? <span className="text-red-600">Fully booked</span>
+                  : `${totalAvailableRooms} room${totalAvailableRooms === 1 ? '' : 's'} available`}
+              </p>
+            )}
           </div>
         </Link>
 

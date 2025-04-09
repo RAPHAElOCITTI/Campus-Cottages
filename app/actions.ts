@@ -312,6 +312,76 @@ export async function createCategoryPage(formData: FormData) {
     data: { categoryName: categoryName, addedCategory: true },
   });
 
+  return redirect(`/create/${hostelId}/rooms`);
+}
+
+export async function addRoomCategories(formData: FormData) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+  const hostelId = formData.get("hostelId") as string;
+
+  // Check ownership
+  const hostel = await prisma.hostel.findUnique({
+    where: { id: hostelId },
+    select: { UserId: true },
+  });
+
+  if (!hostel || hostel.UserId !== user?.id) {
+    throw new Error("You are not authorized to update this listing.");
+  }
+
+  // Process form data to extract categories
+  const formEntries = Array.from(formData.entries());
+  const categoryData = new Map<string, { name: string; count: number; price: number; description: string }>();
+
+  // Extract all categories from form data
+  for (const [key, value] of formEntries) {
+    if (key.startsWith("categories[")) {
+      // Parse the category name and property from the key
+      // Example: categories[shared][count] -> categoryName = shared, property = count
+      const match = key.match(/categories\[([^\]]+)\]\[([^\]]+)\]/);
+      if (match) {
+        const [_, categoryName, property] = match;
+        
+        if (!categoryData.has(categoryName)) {
+          categoryData.set(categoryName, {
+            name: categoryName,
+            count: 0,
+            price: 0,
+            description: "",
+          });
+        }
+        
+        const category = categoryData.get(categoryName)!;
+        
+        if (property === "name") {
+          category.name = value as string;
+        } else if (property === "count") {
+          category.count = parseInt(value as string, 10);
+        } else if (property === "price") {
+          category.price = parseInt(value as string, 10);
+        } else if (property === "description") {
+          category.description = value as string;
+        }
+      }
+    }
+  }
+
+  // Create room categories in database
+  for (const category of categoryData.values()) {
+    await prisma.roomCategory.create({
+      data: {
+        name: category.name,
+        availableRooms: category.count,
+        totalRooms: category.count,
+        price: category.price,
+        description: category.description || undefined,
+        hostelId: hostelId,
+        photos: [], // Initial empty array for photos
+      },
+    });
+  }
+
   return redirect(`/create/${hostelId}/description`);
 }
 
@@ -363,7 +433,7 @@ export async function CreateDescription(formData: FormData) {
       title,
       description,
       price: Number(price),
-      rooms: roomNumber,
+      // Remove the rooms field as it's now handled by room categories
       Kitchen: kitchenNumber,
       bathrooms: bathroomsNumber,
       guests: guestNumber,
@@ -488,6 +558,7 @@ export async function DeleteFromFavorite(formData: FormData) {
 export async function createBooking(formData: FormData) {
   const userId = formData.get("userId") as string;
   const hostelId = formData.get("hostelId") as string;
+  const roomCategoryId = formData.get("roomCategoryId") as string;
   const startDate = formData.get("startDate") as string;
   const endDate = formData.get("endDate") as string;
 
@@ -512,13 +583,41 @@ export async function createBooking(formData: FormData) {
     throw new Error("startDate must be earlier than endDate.");
   }
 
-  await prisma.booking.create({
-    data: {
-      userId: userId,
-      endDate: parsedEndDate,
-      startDate: parsedStartDate,
-      hostelId: hostelId,
-    },
+  // Get the room category and check if rooms are available
+  const roomCategory = await prisma.roomCategory.findUnique({
+    where: { id: roomCategoryId },
+  });
+
+  if (!roomCategory) {
+    throw new Error("Room category not found.");
+  }
+
+  if (roomCategory.availableRooms <= 0) {
+    throw new Error("No rooms available in this category.");
+  }
+
+  // Create booking and update available rooms in a transaction
+  await prisma.$transaction(async (tx) => {
+    // Create booking
+    await tx.booking.create({
+      data: {
+        userId: userId,
+        endDate: parsedEndDate,
+        startDate: parsedStartDate,
+        hostelId: hostelId,
+        roomCategoryId: roomCategoryId,
+      },
+    });
+
+    // Decrement available rooms
+    await tx.roomCategory.update({
+      where: { id: roomCategoryId },
+      data: {
+        availableRooms: {
+          decrement: 1,
+        },
+      },
+    });
   });
 
   return redirect("/");

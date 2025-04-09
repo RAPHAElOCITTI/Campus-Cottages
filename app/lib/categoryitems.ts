@@ -6,6 +6,38 @@ interface iAppProps {
   id: number;
 }
 
+export interface RoomCategoryType {
+  name: string;
+  title: string;
+  description: string;
+  id: number;
+  imageUrl: string;
+}
+
+export const roomCategoryItems: RoomCategoryType[] = [
+  {
+    id: 0,
+    name: "shared",
+    title: "Shared Room",
+    description: "Multiple beds in a single room, shared accommodation",
+    imageUrl: "https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images//shared.png",
+  },
+  {
+    id: 1,
+    name: "single",
+    title: "Single Room",
+    description: "Private room with one bed",
+    imageUrl: "https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images//single.png",
+  },
+  {
+    id: 2,
+    name: "deluxe",
+    title: "Deluxe Room",
+    description: "Premium room with enhanced facilities",
+    imageUrl: "https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images//discount.png",
+  }
+];
+
 export const categoryItems: iAppProps[] = [
   {
     id: 0,

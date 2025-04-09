@@ -10,18 +10,26 @@ import Footer from "./components/CreationBottomBar";
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
 
+type RoomCategory = {
+  id: string;
+  name: string;
+  price: number;
+  availableRooms: number;
+};
+
 type Hostel = {
   id: string;
   title: string;
   photos: string[];
-  price: number;
+  price: number | null;
   description: string;
   location: string;
-  latitude: number | null; // Added latitude
-  longitude: number | null; // Added longitude
-  location_name: string | null; // Added location_name
+  latitude: number | null;
+  longitude: number | null;
+  location_name: string | null;
   Favorite: Array<{ id: string }>;
   UserId: string;
+  RoomCategory: RoomCategory[];
 };
 
 interface SearchParams {
@@ -70,7 +78,7 @@ async function getData({
         categoryName: searchParams?.filter ?? undefined,
         location: searchParams?.location ?? undefined, 
         guests: searchParams?.guests ?? undefined,
-        rooms: searchParams?.room ?? undefined,
+       
         Kitchen: searchParams?.kitchen ?? undefined,
         bathrooms: searchParams?.bathroom ?? undefined,
       },
@@ -96,6 +104,14 @@ async function getData({
               where: { userId: UserId },
             }
           : undefined,
+        RoomCategory: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            availableRooms: true,
+          },
+        },
       },
     });
 
@@ -103,14 +119,15 @@ async function getData({
       id: hostel.id ?? "",
       title: hostel.title ?? "",
       photos: hostel.photos ? (Array.isArray(hostel.photos) ? hostel.photos : [hostel.photos]) : [],
-      price: hostel.price ?? 0,
+      price: hostel.price, // Can be null now, as we might use room category prices instead
       description: hostel.description ?? "",
       location: hostel.location ?? "",
-      latitude: hostel.latitude ?? null, // Added latitude
-      longitude: hostel.longitude ?? null, // Added longitude
-      location_name: hostel.location_name ?? null, // Added location_name
+      latitude: hostel.latitude ?? null,
+      longitude: hostel.longitude ?? null,
+      location_name: hostel.location_name ?? null,
       Favorite: hostel.Favorite ? hostel.Favorite.map((fav) => ({ id: fav.id })) : [],
       UserId: hostel.UserId,
+      RoomCategory: hostel.RoomCategory || [],
     }));
   } catch (error) {
     console.error("Error fetching hostel data:", error);
@@ -170,10 +187,15 @@ async function ShowItems({
                 title={item.title}
                 description={item.description}
                 imagePaths={item.photos}
-                latitude={item.latitude}       // Pass latitude to ListingCard
-                longitude={item.longitude}      // Pass longitude to ListingCard
-                location_name={item.location_name} // Pass location_name to ListingCard
-                price={item.price}
+                latitude={item.latitude}
+                longitude={item.longitude}
+                location_name={item.location_name}
+                price={item.price || undefined}
+                roomCategories={item.RoomCategory.map(cat => ({
+                  name: cat.name,
+                  price: cat.price,
+                  availableRooms: cat.availableRooms
+                }))}
                 userId={userId}
                 favoriteId={item.Favorite[0]?.id}
                 isInFavoriteList={item.Favorite.length > 0}

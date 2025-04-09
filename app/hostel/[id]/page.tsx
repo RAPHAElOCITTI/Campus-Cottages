@@ -1,6 +1,8 @@
 import { createBooking } from "@/app/actions";
 import { CategoryShowcase } from "@/app/components/CategoryShowcase";
 import { HomeMap } from "@/app/components/HomeMap";
+import { RoomCategories } from "@/app/components/RoomCategories";
+import { RoomCategoryDisplay } from "@/app/components/RoomCategoryDisplay";
 import { SelectCalendar } from "@/app/components/SelectCalendar";
 import { BookingSubmitButton } from "@/app/components/SubmitButtons";
 import { prisma } from "@/app/lib/db";
@@ -26,16 +28,14 @@ async function getData(hostelid: string) {
       photos: true,
       description: true,
       guests: true,
-      rooms: true,
       bathrooms: true,
       Kitchen: true,
       title: true,
       categoryName: true,
-      price: true,
       location: true,
       latitude: true,
       longitude: true,
-      location_name: true, // Added location_name
+      location_name: true,
       Booking: {
         where: {
           hostelId: hostelid,
@@ -45,6 +45,17 @@ async function getData(hostelid: string) {
         select: {
           ProfileImage: true,
           firstName: true,
+        },
+      },
+      RoomCategory: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          availableRooms: true,
+          totalRooms: true,
+          description: true,
+          photos: true,
         },
       },
     },
@@ -118,14 +129,16 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500 mt-2">
               <p>{data?.guests} Guests</p>
               <span>·</span>
-              <p>{data?.rooms} Rooms</p>
-              <span>·</span>
               <p>{data?.Kitchen} Kitchen</p>
               <span>·</span>
               <p>{data?.bathrooms} Bathrooms</p>
             </div>
             <Separator className="my-2" />
-            <p className="text-2xl font-normal text-gray-800">{data?.price} USh / sem</p>
+            <p className="text-2xl font-normal text-gray-800">
+              {data?.RoomCategory && data.RoomCategory.length > 0 
+                ? `${Math.min(...data.RoomCategory.map(c => c.price))} - ${Math.max(...data.RoomCategory.map(c => c.price))} USh / sem` 
+                : "Price varies by room type"}
+            </p>
 
           </div>
 
@@ -149,8 +162,6 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
 
           <Separator className="my-2" />
 
-          
-
           {/* Category */}
           <CategoryShowcase categoryName={data?.categoryName as string} />
 
@@ -158,6 +169,11 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
 
           {/* Description */}
           <p className="text-gray-600 leading-relaxed">{data?.description}</p>
+
+          <Separator className="my-2" />
+          
+          {/* Room Categories */}
+          <RoomCategoryDisplay roomCategories={data?.RoomCategory || []} />
 
           <Separator className="my-2" />
 
@@ -177,6 +193,17 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
             <form action={createBooking} className="space-y-6">
               <input type="hidden" name="hostelId" value={(await params).id} />
               <input type="hidden" name="userId" value={user?.id} />
+
+              {/* Room Categories Selection */}
+              {data?.RoomCategory && data.RoomCategory.length > 0 ? (
+                <RoomCategories roomCategories={data.RoomCategory} />
+              ) : (
+                <div className="text-amber-600 bg-amber-50 p-3 rounded-md mb-4">
+                  No room categories are currently available for this hostel.
+                </div>
+              )}
+
+              <Separator className="my-4" />
 
               <div className="space-y-4">
                 <SelectCalendar booking={data?.Booking} />
