@@ -94,6 +94,16 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
   const data = await getData((await params).id);
   const location = getCountryByValue(data?.location as string);
 
+  // Check user role
+  let userRole = null;
+  if (user?.id) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true }
+    });
+    userRole = dbUser?.role;
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-16">
       {/* Title Section */}
@@ -190,36 +200,52 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
         {/* Right Column - Booking Form */}
         <div className="lg:col-span-1">
           <div className="sticky top-8 bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-            <form action={createBooking} className="space-y-6">
-              <input type="hidden" name="hostelId" value={(await params).id} />
-              <input type="hidden" name="userId" value={user?.id} />
+            {userRole === "STUDENT" ? (
+              <form action={createBooking} className="space-y-6">
+                <input type="hidden" name="hostelId" value={(await params).id} />
+                <input type="hidden" name="userId" value={user?.id} />
 
-              {/* Room Categories Selection */}
-              {data?.RoomCategory && data.RoomCategory.length > 0 ? (
-                <RoomCategories roomCategories={data.RoomCategory} />
-              ) : (
-                <div className="text-amber-600 bg-amber-50 p-3 rounded-md mb-4">
-                  No room categories are currently available for this hostel.
+                {/* Room Categories Selection */}
+                {data?.RoomCategory && data.RoomCategory.length > 0 ? (
+                  <RoomCategories roomCategories={data.RoomCategory} />
+                ) : (
+                  <div className="text-amber-600 bg-amber-50 p-3 rounded-md mb-4">
+                    No room categories are currently available for this hostel.
+                  </div>
+                )}
+
+                <Separator className="my-4" />
+
+                <div className="space-y-4">
+                  <SelectCalendar booking={data?.Booking} />
                 </div>
-              )}
 
-              <Separator className="my-4" />
-
-              <div className="space-y-4">
-                <SelectCalendar booking={data?.Booking} />
-              </div>
-
-              {user?.id ? (
                 <BookingSubmitButton />
-              ) : (
+              </form>
+            ) : userRole === "HOSTEL_OWNER" ? (
+              <div className="space-y-4">
+                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                  <h3 className="font-semibold text-amber-700">Hostel Owner Account</h3>
+                  <p className="text-amber-600 mt-2">You are currently signed in as a Hostel Owner. To book this hostel, please switch to a Student account.</p>
+                </div>
+                <Link 
+                  href="/api/auth/creation?role=STUDENT" 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition-colors block text-center"
+                >
+                  Switch to Student Account
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-gray-600">Sign in to book this hostel</p>
                 <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition-colors"
                   asChild
                 >
-                  <Link href="/api/auth/login">Make a Booking Reservation</Link>
+                  <Link href="/api/auth/login">Sign In</Link>
                 </Button>
-              )}
-            </form>
+              </div>
+            )}
           </div>
         </div>
       </div>

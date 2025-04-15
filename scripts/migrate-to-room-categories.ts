@@ -19,12 +19,13 @@ async function migrateToRoomCategories() {
     console.log(`Found ${hostels.length} hostels to migrate`);
     
     for (const hostel of hostels) {
-      // If the hostel has rooms data, use it to create a room category
-      if (hostel.rooms) {
-        const roomCount = parseInt(hostel.rooms, 10) || 1;
-        
-        // Create a default room category based on the hostel's existing data
-        await prisma.roomCategory.create({
+      // Use guests data as a fallback for estimating room count
+      // since we don't have a direct 'rooms' property
+      const guestsCount = hostel.guests ? parseInt(hostel.guests, 10) : null;
+      const roomCount = guestsCount ? Math.ceil(guestsCount / 2) : 1; // Assume ~2 guests per room
+      
+      // Create a default room category based on the hostel's existing data
+      await prisma.roomCategory.create({
           data: {
             name: hostel.categoryName === 'shared' || hostel.categoryName === 'single' 
               ? hostel.categoryName 
@@ -38,9 +39,7 @@ async function migrateToRoomCategories() {
         });
         
         console.log(`Created room category for hostel ${hostel.id}`);
-      } else {
-        console.log(`Skipping hostel ${hostel.id} - no rooms data`);
-      }
+      // No else clause needed - we're handling all hostels now
     }
     
     console.log('Migration completed successfully');

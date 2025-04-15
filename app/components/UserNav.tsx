@@ -15,16 +15,26 @@ import Link from "next/link";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { createcampuscottagesHostel } from "../actions";
 import Image from "next/image";
-
-
+import { prisma } from "../lib/db";
 
 export async function UserNav(){ 
-    const {getUser} = getKindeServerSession()
-    const user = await getUser()
+    const {getUser} = getKindeServerSession();
+    const user = await getUser();
+    
+    // Fetch user role from database if user exists
+    let userRole = null;
+    if (user?.id) {
+        const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { role: true }
+        });
+        userRole = dbUser?.role;
+    }
 
-    const createHostelwithId =  createcampuscottagesHostel.bind(null, {
+    const createHostelwithId = createcampuscottagesHostel.bind(null, {
         userId: user?.id as string,
     });
+    
     return(
         <DropdownMenu>
             <DropdownMenuTrigger>
@@ -39,55 +49,85 @@ export async function UserNav(){
                     alt="Image of the user"
                     className="rounded-full h-8 w-8 hidden lg:block"
                     width={8} height={8}
-                    
                     />
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px]">
                {user ? (
                 <>
-                <DropdownMenuItem>
-                    <form action={createHostelwithId} className="w-full">
-                        <button type="submit" className="w-full text-start">
-                           List your Hostel 
-                        </button>
-
-                    </form>
-                 </DropdownMenuItem>
-                 <DropdownMenuItem>
-                    <Link href="/my-hostels" className="w-full">
-                    My Listings
-                    </Link>
-                 </DropdownMenuItem>
-                 <DropdownMenuItem>
-                    <Link href="/favorites" className="w-full">
-                    My Favorites
-                    </Link>
-                 </DropdownMenuItem>
-                 <DropdownMenuItem>
-                    <Link href="/bookings" className="w-full">
-                    My Bookings
-                    </Link>
-                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                    {/* Role Selection */}
+                    <DropdownMenuItem>
+                        <div className="font-medium w-full text-sm">
+                            Role: {userRole || 'STUDENT'}
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Link href="/api/auth/creation?role=STUDENT" className="w-full text-sm">
+                            Switch to Student
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Link href="/api/auth/creation?role=HOSTEL_OWNER" className="w-full text-sm">
+                            Switch to Hostel Owner
+                        </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <LogoutLink className="w-full">
-                        Logout
-                    </LogoutLink>
-                </DropdownMenuItem>
+                    
+                    {/* Hostel Owner features */}
+                    {userRole === 'HOSTEL_OWNER' && (
+                        <>
+                            <DropdownMenuItem>
+                                <form action={createHostelwithId} className="w-full">
+                                    <button type="submit" className="w-full text-start">
+                                    List your Hostel 
+                                    </button>
+                                </form>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/my-hostels" className="w-full">
+                                My Listings
+                                </Link>
+                            </DropdownMenuItem>
+                        </>
+                    )}
+                    
+                    {/* Student features */}
+                    {userRole === 'STUDENT' && (
+                        <>
+                            <DropdownMenuItem>
+                                <Link href="/bookings" className="w-full">
+                                My Bookings
+                                </Link>
+                            </DropdownMenuItem>
+                        </>
+                    )}
+                    
+                    {/* Common features for all users */}
+                    <DropdownMenuItem>
+                        <Link href="/favorites" className="w-full">
+                        My Favorites
+                        </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <LogoutLink className="w-full">
+                            Logout
+                        </LogoutLink>
+                    </DropdownMenuItem>
                 </>
                ) : (
                 <>
-                 <DropdownMenuItem>
-                    <RegisterLink className="w-full">
-                        Register
-                    </RegisterLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <LoginLink className="w-full">
-                        Login
-                    </LoginLink>
-                </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <RegisterLink className="w-full">
+                            Register
+                        </RegisterLink>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <LoginLink className="w-full">
+                            Login
+                        </LoginLink>
+                    </DropdownMenuItem>
                 </>
                )}
             </DropdownMenuContent>

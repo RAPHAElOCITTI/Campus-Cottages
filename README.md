@@ -1,4 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Campus Cottages
+
+Campus Cottages is a platform connecting students with hostel accommodations near educational institutions. The platform enables students to easily find and book hostels, while hostel owners can list and manage their properties.
+
+## User Roles
+
+The application supports two distinct user roles with different permissions:
+
+### Student Role
+- Browse available hostels and view detailed information
+- Add hostels to favorites list
+- Book rooms in hostels for specific date ranges
+- Manage their bookings
+
+### Hostel Owner Role
+- Create and list hostel properties
+- Add detailed information including photos, description, and location
+- Define room categories with different prices and availability
+- Manage their hostel listings
 
 ## Getting Started
 
@@ -16,21 +34,32 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Authentication and Role Selection
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Users can register and log in using Kinde authentication. After registration, they can switch between Student and Hostel Owner roles through the user menu.
 
-## Learn More
+## Technology Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 14 with App Router
+- **Authentication**: Kinde Auth
+- **Database**: PostgreSQL with Prisma ORM
+- **Storage**: Supabase for image storage
+- **Styling**: Tailwind CSS with Shadcn UI components
+- **Maps**: Integration for hostel location display
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **User Management**: Authentication, role-based access control
+- **Hostel Management**: Creation, editing, and detailed hostel information
+- **Room Categories**: Different room types with varying prices
+- **Booking System**: Date selection, room category booking
+- **Location Services**: Map integration for hostel locations
+- **Responsive Design**: Mobile and desktop friendly UI
 
-## Deploy on Vercel
+## Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Required environment variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `DIRECT_URL` - Direct database connection (for Prisma)
+- Kinde Auth configuration variables
+- Supabase configuration for image storage

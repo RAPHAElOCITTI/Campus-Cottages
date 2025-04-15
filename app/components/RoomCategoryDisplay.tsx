@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Badge as UiBadge } from "@/components/ui/badge";
 
 interface RoomCategory {
   id: string;
@@ -87,24 +87,24 @@ export function RoomCategoryDisplay({ roomCategories }: RoomCategoryDisplayProps
 function AvailabilityBadge({ available }: { available: number }) {
   if (available === 0) {
     return (
-      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+      <UiBadge variant="outline" className="bg-red-50 text-red-700 border-red-200">
         Fully Booked
-      </Badge>
+      </UiBadge>
     );
   }
   
   if (available < 3) {
     return (
-      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+      <UiBadge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
         Limited Availability
-      </Badge>
+      </UiBadge>
     );
   }
   
   return (
-    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+    <UiBadge variant="outline" className="bg-green-50 text-green-700 border-green-200">
       Available
-    </Badge>
+    </UiBadge>
   );
 }
 
