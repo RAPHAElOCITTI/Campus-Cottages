@@ -224,15 +224,15 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
               </form>
             ) : userRole === "HOSTEL_OWNER" ? (
               <div className="space-y-4">
-                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                  <h3 className="font-semibold text-amber-700">Hostel Owner Account</h3>
-                  <p className="text-amber-600 mt-2">You are currently signed in as a Hostel Owner. To book this hostel, please switch to a Student account.</p>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h3 className="font-semibold text-blue-700">Hostel Owner Account</h3>
+                  <p className="text-blue-600 mt-2">As a hostel owner, you can list your own hostels instead of booking.</p>
                 </div>
                 <Link 
-                  href="/api/auth/creation?role=STUDENT" 
+                  href="/my-hostels" 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition-colors block text-center"
                 >
-                  Switch to Student Account
+                  Manage My Hostels
                 </Link>
               </div>
             ) : (
