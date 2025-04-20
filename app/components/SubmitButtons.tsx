@@ -24,11 +24,12 @@ export function CreateSubmit({ disabled }: CreateSubmitProps) {
             ):(
                 <Button 
                     type="submit" 
-                    size="lg" 
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700"
                     disabled={disabled}
                     title={disabled ? "Required fields are missing" : "Continue to next step"}
                 >
-                    Next
+                    Continue
                 </Button>
             )}
         </>

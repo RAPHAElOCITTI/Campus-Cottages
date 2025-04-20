@@ -17,15 +17,11 @@ export default function StructureRoute({ params }: PageProps) {
   useEffect(() => {
     params
       .then((result) => {
-        console.log("Params resolved:", result);
         setResolvedParams(result);
       })
       .catch((err) => {
         console.error("Error resolving params:", err);
         setError("Failed to load hostel details.");
-      })
-      .finally(() => {
-        console.log("Params resolution completed.");
       });
   }, [params]);
 
@@ -43,14 +39,15 @@ export default function StructureRoute({ params }: PageProps) {
     return (
       <>
         <div className="w-3/5 mx-auto">
-          <h2 className="text-2xl font-semibold tracking-tight transition-colors">
+          <h2 className="text-2xl font-semibold tracking-tight transition-colors mb-2">
             Which of the best describes your Hostel?
           </h2>
+          <p className="text-gray-600">
+            Select a category and click Continue to start listing your hostel. Your selection is pre-filled to make the process faster.
+          </p>
         </div>
-
         
-        
-        <form action={createCategoryPage}>
+        <form action={createCategoryPage} className="relative">
           <input type="hidden" name="hostelId" value={resolvedParams.id} />
           <SelectCategory />
           <CreateBottomBar />

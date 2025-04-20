@@ -10,15 +10,20 @@ interface CreateBottomBarProps {
 
 export function CreateBottomBar({ disableSubmit, disableMessage }: CreateBottomBarProps) {
     return (
-        <div className="fixed w-full bottom-0 z-10 bg-white border-t h-24">
-        <div className="flex items-centre justify-between mx-auto px-5 lg:px-10 h-full">
-            <Button size="lg" asChild>
+        <div className="fixed w-full bottom-0 z-10 bg-white border-t h-24 shadow-lg">
+        <div className="flex items-center justify-between mx-auto px-5 lg:px-10 h-full">
+            <Button size="lg" variant="outline" asChild>
                <Link href="/">Cancel</Link>
             </Button>
             {disableMessage && (
                 <div className="text-sm text-amber-600 mr-4">{disableMessage}</div>
             )}
-            <CreateSubmit disabled={disableSubmit} />
+            <div className="flex flex-col items-end">
+                <CreateSubmit disabled={disableSubmit} />
+                {!disableSubmit && (
+                    <span className="text-xs text-green-600 mt-1">Just one click to continue</span>
+                )}
+            </div>
         </div>
     </div>
     )

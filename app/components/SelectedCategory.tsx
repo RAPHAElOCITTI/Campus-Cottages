@@ -7,9 +7,8 @@ import Image from "next/image"
 import { useState } from "react";
 
 export function SelectCategory(){
-    const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
-        undefined
-    );
+    // Initialize with 'shared' category selected by default for quicker flow
+    const [selectedCategory, setSelectedCategory] = useState<string>("shared");
     return(
         <div className="grid grid-cols-4 gap-8 mt-10 w-3/5 mx-auto mb-36">
             <input 

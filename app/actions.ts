@@ -257,38 +257,33 @@ import MyComponent from "@/app/UploadHandling"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export async function createcampuscottagesHostel({ userId }: { userId: string }) {
-  // Check user's role
+  // Check user's role or automatically set to HOSTEL_OWNER for this flow
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { role: true },
+    select: { role: true, id: true },
   });
 
-  if (user?.role !== "HOSTEL_OWNER") {
-    throw new Error("Only Hostel-Owners can create hostel listings.");
+  if (!user) {
+    throw new Error("User not found. Please sign in first.");
+  }
+  
+  // If user is not a hostel owner, update their role
+  if (user.role !== "HOSTEL_OWNER") {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { role: "HOSTEL_OWNER" },
+    });
+    // *** ADDED: Revalidate path after role change ***
+    revalidatePath('/'); // Assuming UserNav is rendered on the root path or a layout that includes it
   }
 
-  const data = await prisma.hostel.findFirst({
-    where: { UserId: userId },
-    orderBy: { createdAT: "desc" },
+  // Create a new hostel to start the flow immediately
+  const newHostel = await prisma.hostel.create({
+    data: { UserId: userId },
   });
-
-  if (data === null) {
-    const data = await prisma.hostel.create({
-      data: { UserId: userId },
-    });
-    return redirect(`/create/${data.id}/structure`);
-  } else if (!data.addedCategory && !data.addedDescription && !data.addedLocation) {
-    return redirect(`/create/${data.id}/structure`);
-  } else if (data.addedCategory && !data.addedDescription) {
-    return redirect(`/create/${data.id}/description`);
-  } else if (data.addedCategory && data.addedDescription && !data.addedLocation) {
-    return redirect(`/create/${data.id}/address`);
-  } else {
-    const data = await prisma.hostel.create({
-      data: { UserId: userId },
-    });
-    return redirect(`/create/${data.id}/structure`);
-  }
+  
+  // Redirect directly to structure page
+  return redirect(`/create/${newHostel.id}/structure`);
 }
 
 export async function createCategoryPage(formData: FormData) {
