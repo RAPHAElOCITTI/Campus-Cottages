@@ -18,6 +18,7 @@ import { createcampuscottagesHostel } from "../actions";
 import Image from "next/image";
 import { prisma } from "../lib/db";
 import { Badge } from "@/components/ui/badge";
+import { useTransition } from "react";
 
 export async function UserNav(){ 
     const {getUser} = getKindeServerSession();
@@ -33,9 +34,10 @@ export async function UserNav(){
         userRole = dbUser?.role;
     }
 
-    const createHostelwithId = createcampuscottagesHostel.bind(null, {
-        UserId: user?.id as string,
-    });
+    // Create binding with the correct parameter name (userId, not UserId)
+    const createHostelwithId = user?.id 
+        ? createcampuscottagesHostel.bind(null, { userId: user.id }) 
+        : null;
     
     return(
         <DropdownMenu>
@@ -95,7 +97,10 @@ export async function UserNav(){
                         <>
                             <DropdownMenuItem className="cursor-pointer bg-green-50 hover:bg-green-100 border border-green-200 rounded-md my-1 p-0 overflow-hidden">
                                 <form action={createHostelwithId} className="w-full">
-                                    <button type="submit" className="w-full text-start flex items-center gap-2 text-green-700 p-2 h-full">
+                                    <button 
+                                        type="submit" 
+                                        className="w-full text-start flex items-center gap-2 text-green-700 p-2 h-full"
+                                    >
                                         <HomeIcon className="h-4 w-4" />
                                         <span>List your Hostel</span>
                                     </button>
