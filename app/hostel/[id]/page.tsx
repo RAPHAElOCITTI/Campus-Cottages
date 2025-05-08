@@ -6,6 +6,7 @@ import { RoomCategoryDisplay } from "@/app/components/RoomCategoryDisplay";
 import { SelectCalendar } from "@/app/components/SelectCalendar";
 import { BookingSubmitButton } from "@/app/components/SubmitButtons";
 import { prisma } from "@/app/lib/db";
+import { MobileMoneyPayment } from "@/app/components/MobileMoneyPayment";
 import { useCountries } from "@/app/lib/getCountries";
 import { Button } from "@/components/ui/button";
 import { PhotoModal } from "@/app/components/PhotoModal";
@@ -36,6 +37,9 @@ async function getData(hostelid: string) {
       latitude: true,
       longitude: true,
       location_name: true,
+      contactPhone: true, // Added contactPhone
+      contactEmail: true, // Added contactEmail
+      contactWhatsapp: true, // Added contactWhatsapp
       Booking: {
         where: {
           hostelId: hostelid,
@@ -201,27 +205,96 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
         <div className="lg:col-span-1">
           <div className="sticky top-8 bg-white p-6 rounded-lg shadow-lg border border-gray-200">
             {userRole === "STUDENT" ? (
-              <form action={createBooking} className="space-y-6">
-                <input type="hidden" name="hostelId" value={(await params).id} />
-                <input type="hidden" name="userId" value={user?.id} />
-
-                {/* Room Categories Selection */}
+              <>
+                {/* Mobile Money Payment Component */}
                 {data?.RoomCategory && data.RoomCategory.length > 0 ? (
-                  <RoomCategories roomCategories={data.RoomCategory} />
+                  <div className="space-y-6">
+                    {/* Room Categories Selection */}
+                    <RoomCategories roomCategories={data.RoomCategory} />
+                    
+                    <Separator className="my-4" />
+
+                    {/* Mobile Money Payment Component */}
+                    <div className="mt-4">
+                      {/* This will be conditionally shown based on payment status */}
+                      {/* The full implementation would check if payment exists and is completed */}
+                      <div className="dynamic-payment-section" id="payment-section">
+                        {/* Import and use the MobileMoneyPayment component */}
+                        {/* 
+                          In a real implementation, you would:
+                          1. Check if a payment exists for this user/hostel combination
+                          2. If payment exists and is complete, show contact info and booking form
+                          3. If payment doesn't exist or isn't complete, show the payment component
+                        */}
+                        <div className="hidden">
+                          {/* This is just a placeholder that would be replaced by the actual component */}
+                          {/* 
+                            <MobileMoneyPayment 
+                              hostelId={(await params).id}
+                              roomCategoryId={selectedCategoryId}
+                              roomCategoryName={selectedCategory?.name || ""}
+                              roomPrice={selectedCategory?.price || 0}
+                            />
+                          */}
+                        </div>
+                        
+                        {/* For now, we'll show a message about the payment feature */}
+                        <div className="border rounded-lg p-4 mb-4">
+                          <h3 className="font-medium mb-2">Mobile Money Payment Required</h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            To proceed with booking, you need to send a 5,000 UGX fee via Mobile Money.
+                            This gives you access to the hostel owner's contact info and booking ability.
+                          </p>
+                          <div className="bg-amber-50 p-3 rounded-lg">
+                            <p className="text-xs text-amber-700">
+                              The MobileMoneyPayment component would be shown here, with instructions and payment tracking.
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Hidden Contact Info (would be shown after payment) */}
+                        <div className="hidden">
+                          <div className="border rounded-lg p-4 mb-4">
+                            <h3 className="font-medium mb-2">Hostel Owner Contact Information</h3>
+                            <div className="space-y-2 text-sm">
+                              <p><strong>Phone:</strong> {data?.contactPhone || "Not provided"}</p>
+                              {data?.contactEmail && (
+                                <p><strong>Email:</strong> {data.contactEmail}</p>
+                              )}
+                              {data?.contactWhatsapp && (
+                                <p><strong>WhatsApp:</strong> {data.contactWhatsapp}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Dates section (always visible) */}
+                        <div className="space-y-4">
+                          <SelectCalendar booking={data?.Booking} />
+                        </div>
+                        
+                        {/* Booking button (would be enabled after payment) */}
+                        <div className="mt-4">
+                          <form action={createBooking}>
+                            <input type="hidden" name="hostelId" value={(await params).id} />
+                            <input type="hidden" name="userId" value={user?.id} />
+                            <input type="hidden" name="roomCategoryId" id="selected-category-id" value="" />
+                            
+                            {/* Disabled until payment is complete */}
+                            <Button disabled type="submit" className="w-full bg-gray-400 cursor-not-allowed">
+                              Book Now (Requires Payment)
+                            </Button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-amber-600 bg-amber-50 p-3 rounded-md mb-4">
                     No room categories are currently available for this hostel.
                   </div>
                 )}
-
-                <Separator className="my-4" />
-
-                <div className="space-y-4">
-                  <SelectCalendar booking={data?.Booking} />
-                </div>
-
-                <BookingSubmitButton />
-              </form>
+              </>
             ) : userRole === "HOSTEL_OWNER" ? (
               <div className="space-y-4">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">

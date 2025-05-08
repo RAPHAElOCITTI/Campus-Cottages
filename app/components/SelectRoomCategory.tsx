@@ -58,6 +58,69 @@ export function SelectRoomCategory({ hostelId }: RoomCategoryFormProps) {
     }
   };
 
+  // Phone number validation
+  const validatePhoneNumber = (phone: string) => {
+    // Basic validation for Ugandan phone numbers
+    // Allow formats like: +256700000000, 256700000000, 0700000000
+    const phoneRegex = /^(?:\+256|256|0)[7][0-9]{8}$/;
+    return phone === "" || phoneRegex.test(phone);
+  };
+
+  // Email validation
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return email === "" || emailRegex.test(email);
+  };
+
+  // Form validation state
+  const [validation, setValidation] = useState({
+    phoneValid: true,
+    emailValid: true,
+    whatsappValid: true,
+    phoneError: "",
+    emailError: "",
+    whatsappError: "",
+  });
+
+  // Form data state
+  const [contactForm, setContactForm] = useState({
+    phone: "",
+    email: "",
+    whatsapp: "",
+  });
+
+  // Handle input changes
+  const handleContactChange = (field: string, value: string) => {
+    setContactForm({
+      ...contactForm,
+      [field]: value,
+    });
+
+    // Validate as user types
+    if (field === "phone") {
+      const isValid = validatePhoneNumber(value);
+      setValidation({
+        ...validation,
+        phoneValid: isValid,
+        phoneError: isValid ? "" : "Please enter a valid Ugandan phone number",
+      });
+    } else if (field === "email") {
+      const isValid = validateEmail(value);
+      setValidation({
+        ...validation,
+        emailValid: isValid,
+        emailError: isValid ? "" : "Please enter a valid email address",
+      });
+    } else if (field === "whatsapp") {
+      const isValid = validatePhoneNumber(value);
+      setValidation({
+        ...validation,
+        whatsappValid: isValid,
+        whatsappError: isValid ? "" : "Please enter a valid WhatsApp number",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 w-3/5 mx-auto">
       <div>
@@ -85,6 +148,68 @@ export function SelectRoomCategory({ hostelId }: RoomCategoryFormProps) {
               </Card>
             </div>
           ))}
+        </div>
+      </div>
+      
+      {/* Contact details section */}
+      <div className="mt-8 border rounded-lg p-6">
+        <h3 className="text-lg font-medium mb-4">Contact Information</h3>
+        <p className="text-sm text-gray-500 mb-4">
+          Please provide your contact details. These will be revealed to students only after they
+          complete the Mobile Money payment.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="contactPhone" className="mb-1 block">Phone Number*</Label>
+            <Input 
+              id="contactPhone"
+              name="contactPhone"
+              type="tel"
+              placeholder="+256 700 000 000"
+              required
+              value={contactForm.phone}
+              onChange={(e) => handleContactChange("phone", e.target.value)}
+              className={!validation.phoneValid ? "border-red-500" : ""}
+            />
+            {!validation.phoneValid && (
+              <p className="text-red-500 text-xs mt-1">{validation.phoneError}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">Format: +256700000000 or 0700000000</p>
+          </div>
+          
+          <div>
+            <Label htmlFor="contactEmail" className="mb-1 block">Email Address</Label>
+            <Input 
+              id="contactEmail"
+              name="contactEmail"
+              type="email"
+              placeholder="your@email.com"
+              value={contactForm.email}
+              onChange={(e) => handleContactChange("email", e.target.value)}
+              className={!validation.emailValid ? "border-red-500" : ""}
+            />
+            {!validation.emailValid && (
+              <p className="text-red-500 text-xs mt-1">{validation.emailError}</p>
+            )}
+          </div>
+          
+          <div>
+            <Label htmlFor="contactWhatsapp" className="mb-1 block">WhatsApp Number</Label>
+            <Input 
+              id="contactWhatsapp"
+              name="contactWhatsapp"
+              type="tel"
+              placeholder="+256 700 000 000"
+              value={contactForm.whatsapp}
+              onChange={(e) => handleContactChange("whatsapp", e.target.value)}
+              className={!validation.whatsappValid ? "border-red-500" : ""}
+            />
+            {!validation.whatsappValid && (
+              <p className="text-red-500 text-xs mt-1">{validation.whatsappError}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">Leave empty if same as phone number</p>
+          </div>
         </div>
       </div>
 

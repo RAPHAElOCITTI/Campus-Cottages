@@ -14,15 +14,16 @@ enum UserRole {
 }
 
 model User {
-  id           String   @id @unique
-  ProfileImage String?
-  email        String
-  firstName    String
-  lastName     String
-  role         UserRole @default(STUDENT)
-  Hostel       Hostel[]
-  Favorite     Favorite[]
-  Booking      Booking[]
+  id             String   @id @unique
+  ProfileImage   String?
+  email          String
+  firstName      String
+  lastName       String
+  role           UserRole @default(STUDENT)
+  Hostel         Hostel[]
+  Favorite       Favorite[]
+  Booking        Booking[]
+  PaymentAttempt PaymentAttempt[]
 }
 
 model Hostel {
@@ -46,11 +47,17 @@ model Hostel {
   longitude      Float?
   // Added location_name for user-friendly display
   location_name    String?
+  // Owner contact details
+  contactPhone     String?
+  contactEmail     String?
+  contactWhatsapp  String?
+  contactHidden    Boolean  @default(true)  // Whether contact info is hidden until payment
   User             User?    @relation(fields: [UserId], references: [id])
   Favorite         Favorite[]
   Booking          Booking[]
   // New relationship with RoomCategory
   RoomCategory     RoomCategory[]
+  PaymentAttempt   PaymentAttempt[]
 }
 
 model Favorite {
@@ -88,4 +95,27 @@ model RoomCategory {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   Booking        Booking[]
+  PaymentAttempt PaymentAttempt[]
+}
+
+enum PaymentStatus {
+  PENDING
+  PENDING_CONFIRMATION
+  COMPLETED
+  FAILED
+}
+
+model PaymentAttempt {
+  id             String        @id @default(uuid())
+  referenceCode  String        @unique // Generated unique code for tracking payment
+  amount         Int           @default(5000) // Fixed fee of 5000 UGX
+  status         PaymentStatus @default(PENDING)
+  user           User          @relation(fields: [userId], references: [id])
+  userId         String
+  hostel         Hostel        @relation(fields: [hostelId], references: [id])
+  hostelId       String
+  roomCategory   RoomCategory  @relation(fields: [roomCategoryId], references: [id])
+  roomCategoryId String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }

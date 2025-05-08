@@ -325,6 +325,63 @@ export async function addRoomCategories(formData: FormData) {
     throw new Error("You are not authorized to update this listing.");
   }
 
+  // Get contact details from form
+  const contactPhone = formData.get("contactPhone") as string;
+  const contactEmail = formData.get("contactEmail") as string;
+  const contactWhatsapp = formData.get("contactWhatsapp") as string;
+  
+  // Validate phone number (required field)
+  if (!contactPhone) {
+    throw new Error("Phone number is required");
+  }
+  
+  // Basic validation for Ugandan phone numbers
+  const phoneRegex = /^(?:\+256|256|0)[7][0-9]{8}$/;
+  if (!phoneRegex.test(contactPhone)) {
+    throw new Error("Please enter a valid Ugandan phone number");
+  }
+  
+  // Validate email if provided
+  if (contactEmail) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactEmail)) {
+      throw new Error("Please enter a valid email address");
+    }
+  }
+  
+  // Validate WhatsApp number if provided
+  if (contactWhatsapp && !phoneRegex.test(contactWhatsapp)) {
+    throw new Error("Please enter a valid WhatsApp number");
+  }
+  
+  // Format phone numbers consistently
+  let formattedPhone = contactPhone;
+  if (contactPhone.startsWith('0')) {
+    formattedPhone = `+256${contactPhone.substring(1)}`;
+  } else if (!contactPhone.startsWith('+')) {
+    formattedPhone = `+${contactPhone}`;
+  }
+  
+  let formattedWhatsapp = contactWhatsapp;
+  if (contactWhatsapp) {
+    if (contactWhatsapp.startsWith('0')) {
+      formattedWhatsapp = `+256${contactWhatsapp.substring(1)}`;
+    } else if (!contactWhatsapp.startsWith('+')) {
+      formattedWhatsapp = `+${contactWhatsapp}`;
+    }
+  }
+  
+  // Update hostel with contact information
+  await prisma.hostel.update({
+    where: { id: hostelId },
+    data: {
+      contactPhone: formattedPhone,
+      contactEmail,
+      contactWhatsapp: formattedWhatsapp || formattedPhone, // If WhatsApp not provided, use phone number
+      contactHidden: true, // Default to hidden until payment
+    },
+  });
+
   // Process form data to extract categories
   const formEntries = Array.from(formData.entries());
   const categoryData = new Map<string, { name: string; count: number; price: number; description: string }>();
@@ -360,6 +417,11 @@ export async function addRoomCategories(formData: FormData) {
         }
       }
     }
+  }
+
+  // Ensure at least one category is selected
+  if (categoryData.size === 0) {
+    throw new Error("Please select at least one room category");
   }
 
   // Create room categories in database

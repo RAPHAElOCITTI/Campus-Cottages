@@ -22,6 +22,9 @@ interface iAppProps {
   location_name: string | null; // Add location_name
   price?: number;
   roomCategories?: RoomCategoryInfo[];
+  contactPhone?:     string;
+  contactEmail?:     string;
+  contactWhatsapp?:  string;
   title: string;
   userId: string | undefined;
   isInFavoriteList: boolean;
@@ -42,6 +45,9 @@ export function ListingCard({
   location_name,
   price,
   roomCategories,
+  contactPhone,
+  contactEmail,
+  contactWhatsapp,
   userId,
   favoriteId,
   isInFavoriteList,

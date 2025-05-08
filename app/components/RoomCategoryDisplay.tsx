@@ -53,16 +53,79 @@ export function RoomCategoryDisplay({ roomCategories }: RoomCategoryDisplayProps
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <h4 className="text-sm font-medium mb-2">Features</h4>
                 <div className="flex flex-wrap gap-2">
-                  {category.name === 'shared' && (
+                {category.name === 'Dormitory Rooms' && (
                     <>
-                      <FeatureBadge>Shared Space</FeatureBadge>
+                      <FeatureBadge>Shared Rooms, Multiple beds</FeatureBadge>
+                      <FeatureBadge>Accomodate three guests</FeatureBadge>
+                      <FeatureBadge>Community</FeatureBadge>
+                    </>
+                  )} 
+                {category.name === 'Tripple Rooms' && (
+                    <>
+                      <FeatureBadge>Tripple Rooms</FeatureBadge>
+                      <FeatureBadge>Accomodate three guests</FeatureBadge>
+                      <FeatureBadge>Community</FeatureBadge>
+                    </>
+                  )}
+                {category.name === 'Twin Rooms' && (
+                    <>
+                      <FeatureBadge>Twin Rooms</FeatureBadge>
+                      <FeatureBadge>Two seoerate single beds</FeatureBadge>
+                      <FeatureBadge>Community</FeatureBadge>
+                    </>
+                  )}
+                   {category.name === 'shared' && (
+                    <>
+                      <FeatureBadge>Shared Space, not self-contained</FeatureBadge>
                       <FeatureBadge>Budget-friendly</FeatureBadge>
                       <FeatureBadge>Community</FeatureBadge>
                     </>
                   )}
+                  {category.name === 'shared' && (
+                    <>
+                      <FeatureBadge>Shared Space, self-contained</FeatureBadge>
+                      <FeatureBadge>Budget-friendly</FeatureBadge>
+                      <FeatureBadge>Community</FeatureBadge>
+                    </>
+                  )}
+                  {category.name === 'shared' && (
+                    <>
+                      <FeatureBadge>Shared Space, without balcony</FeatureBadge>
+                      <FeatureBadge>Budget-friendly</FeatureBadge>
+                      <FeatureBadge>Community</FeatureBadge>
+                    </>
+                  )}
+                  {category.name === 'shared' && (
+                    <>
+                      <FeatureBadge>Shared Space, with balcony</FeatureBadge>
+                      <FeatureBadge>Budget-friendly</FeatureBadge>
+                      <FeatureBadge>Community</FeatureBadge>
+                    </>
+                  )}
+                   {category.name === 'single' && (
+                    <>
+                      <FeatureBadge>Private Room, not self-contained</FeatureBadge>
+                      <FeatureBadge>Single Bed</FeatureBadge>
+                      <FeatureBadge>Privacy</FeatureBadge>
+                    </>
+                  )}
+                   {category.name === 'single' && (
+                    <>
+                      <FeatureBadge>Private Room, self-contained</FeatureBadge>
+                      <FeatureBadge>Single Bed</FeatureBadge>
+                      <FeatureBadge>Privacy</FeatureBadge>
+                    </>
+                  )}
                   {category.name === 'single' && (
                     <>
-                      <FeatureBadge>Private Room</FeatureBadge>
+                      <FeatureBadge>Private Room, without balcony</FeatureBadge>
+                      <FeatureBadge>Single Bed</FeatureBadge>
+                      <FeatureBadge>Privacy</FeatureBadge>
+                    </>
+                  )}
+                  {category.name === 'single' && (
+                    <>
+                      <FeatureBadge>Private Room, with balcony</FeatureBadge>
                       <FeatureBadge>Single Bed</FeatureBadge>
                       <FeatureBadge>Privacy</FeatureBadge>
                     </>

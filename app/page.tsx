@@ -104,6 +104,13 @@ async function getData({
               where: { userId: UserId },
             }
           : undefined,
+        contactPhone: true,
+        contactEmail: true,
+        contactWhatsapp: true,
+        // Selecting the RoomCategory relation
+        // and including the necessary fields
+        // Note: Adjust the fields based on your actual RoomCategory model
+
         RoomCategory: {
           select: {
             id: true,
