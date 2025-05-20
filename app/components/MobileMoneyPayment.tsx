@@ -6,7 +6,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Loader2, Lock, CheckCircle, AlertCircle } from "lucide-react";
 import { nanoid } from "nanoid";
 
+
+
 interface MobileMoneyPaymentProps {
+  className?: string;
   hostelId: string;
   roomCategoryId: string;
   roomCategoryName: string;

@@ -250,11 +250,71 @@ export async function createBooking(formData: FormData) {
    "use server";
 
 import { redirect } from "next/navigation";
+import { PaymentService } from "daraza";
 import { prisma } from "./lib/db";
 import { supabase } from "./lib/supabase";
 import { revalidatePath } from "next/cache";
 import MyComponent from "@/app/UploadHandling"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+
+const paymentService = new PaymentService({
+  apiKey: process.env.DARAZA_API_KEY || "9CifVRh7.7HxqysLUR4K9iTyZQce3yEFTqEa3i1Qm",
+});
+
+// A server action to handle the payment request
+export async function initiateDarazaPayment(
+  hostelId: string,
+  roomCategoryId: string,
+  amount: number,
+  phone: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    // Validate phone number and amount using the Daraza library
+    const validatedPhone = paymentService.validatePhoneNumber(phone);
+    const validatedAmount = paymentService.validateAmount(amount);
+
+    // Prepare payment data
+    const paymentData = {
+      method: 1, // Assuming '1' is the correct method for mobile money based on your curl example
+      amount: validatedAmount,
+      phone: validatedPhone,
+      note: `Hostel booking fee for hostel: ${hostelId}, room: ${roomCategoryId}`,
+    };
+
+    console.log("Attempting Daraza payment with:", paymentData);
+
+    // Request to pay
+    const response = await paymentService.requestToPay(paymentData);
+
+    console.log("Daraza Payment Response:", response);
+
+    if (response.code === "Success") {
+      // Here you would typically also:
+      // 1. Save payment status to your database (e.g., mark it as 'initiated' or 'pending')
+      // 2. Associate the payment with the user, hostel, and room category
+      // 3. Implement a webhook or polling mechanism to confirm final payment status from Daraza
+      //    (this is crucial for actual production systems)
+
+      return {
+        success: true,
+        message:
+          "Payment initiated successfully! Please approve the payment on your phone.",
+      };
+    } else {
+      // Handle different error codes from Daraza API if available
+      return {
+        success: false,
+        message: `Payment failed: ${response.details || "Unknown error"}`,
+      };
+    }
+  } catch (error: any) {
+    console.error("Daraza payment action error:", error);
+    return {
+      success: false,
+      message: `Payment processing error: ${error.message || "An unexpected error occurred."}`,
+    };
+  }
+}
 
 export async function createcampuscottagesHostel({ userId }: { userId: string }) {
   // Check user's role or automatically set to HOSTEL_OWNER for this flow

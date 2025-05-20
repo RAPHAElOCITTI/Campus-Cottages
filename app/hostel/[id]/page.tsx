@@ -6,7 +6,7 @@ import { RoomCategoryDisplay } from "@/app/components/RoomCategoryDisplay";
 import { SelectCalendar } from "@/app/components/SelectCalendar";
 import { BookingSubmitButton } from "@/app/components/SubmitButtons";
 import { prisma } from "@/app/lib/db";
-import { MobileMoneyPayment } from "@/app/components/MobileMoneyPayment";
+//import { MobileMoneyPayment } from "@/app/components/MobileMoneyPayment";
 import { useCountries } from "@/app/lib/getCountries";
 import { Button } from "@/components/ui/button";
 import { PhotoModal } from "@/app/components/PhotoModal";
@@ -17,6 +17,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { Metadata, ResolvingMetadata } from "next";
+
+// NEW IMPORTS
+import { PaymentFormComponent } from "@/app/components/PaymentFormComponent";
+import { initiateDarazaPayment } from "@/app/actions";
+import { RoomCategory } from "@prisma/client"; // Import RoomCategory type
+
 
 // Define getData function
 async function getData(hostelid: string) {
@@ -97,6 +103,8 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
 
   const data = await getData((await params).id);
   const location = getCountryByValue(data?.location as string);
+  
+  
 
   // Check user role
   let userRole = null;
@@ -107,6 +115,25 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
     });
     userRole = dbUser?.role;
   }
+
+   // --- NEW: Check payment status from the database ---
+  let hasUserPaid = false;
+  if (user?.id) {
+    // Implement your logic to check if the user has paid the access fee
+    // This could be a separate table, or a field on the User or Hostel table.
+    // For demonstration, let's assume a simple check.
+    // In a real app, you'd check a `Payment` table for a successful transaction.
+    const paymentRecord = await prisma.payment.findFirst({ // Assuming you have a Payment model
+        where: {
+            userId: user.id,
+            hostelId: (await params).id,
+            status: 'SUCCESS', // Or 'COMPLETED' or 'APPROVED'
+            purpose: 'ACCESS_FEE' // A custom field to identify this specific payment type
+        }
+    });
+    hasUserPaid = !!paymentRecord; // If a record exists, assume they've paid
+  }
+  // --- END NEW ---
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-16">
@@ -214,80 +241,80 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
                     
                     <Separator className="my-4" />
 
-                    {/* Mobile Money Payment Component */}
-                    <div className="mt-4">
-                      {/* This will be conditionally shown based on payment status */}
-                      {/* The full implementation would check if payment exists and is completed */}
+                     {/* Conditional rendering based on payment status */}
+                    {hasUserPaid ? (
+                      // --- Show Contact Info and Booking Form after payment ---
                       <div className="dynamic-payment-section" id="payment-section">
-                        {/* Import and use the MobileMoneyPayment component */}
-                        {/* 
-                          In a real implementation, you would:
-                          1. Check if a payment exists for this user/hostel combination
-                          2. If payment exists and is complete, show contact info and booking form
-                          3. If payment doesn't exist or isn't complete, show the payment component
-                        */}
-                        <div className="hidden">
-                          {/* This is just a placeholder that would be replaced by the actual component */}
-                          {/* 
-                            <MobileMoneyPayment 
-                              hostelId={(await params).id}
-                              roomCategoryId={selectedCategoryId}
-                              roomCategoryName={selectedCategory?.name || ""}
-                              roomPrice={selectedCategory?.price || 0}
-                            />
-                          */}
-                        </div>
-                        
-                        {/* For now, we'll show a message about the payment feature */}
                         <div className="border rounded-lg p-4 mb-4">
-                          <h3 className="font-medium mb-2">Mobile Money Payment Required</h3>
-                          <p className="text-sm text-gray-600 mb-2">
-                            To proceed with booking, you need to send a 5,000 UGX fee via Mobile Money.
-                            This gives you access to the hostel owner's contact info and booking ability.
+                          <h3 className="font-medium mb-2">
+                            Hostel Owner Contact Information
+                          </h3>
+                          <p className="text-sm text-green-600 mb-3">
+                            Payment confirmed! You can now contact the owner and book.
                           </p>
-                          <div className="bg-amber-50 p-3 rounded-lg">
-                            <p className="text-xs text-amber-700">
-                              The MobileMoneyPayment component would be shown here, with instructions and payment tracking.
+                          <div className="space-y-2 text-sm">
+                            <p>
+                              <strong>Phone:</strong>{" "}
+                              {data?.contactPhone || "Not provided"}
                             </p>
+                            {data?.contactEmail && (
+                              <p>
+                                <strong>Email:</strong> {data.contactEmail}
+                              </p>
+                            )}
+                            {data?.contactWhatsapp && (
+                              <p>
+                                <strong>WhatsApp:</strong> {data.contactWhatsapp}
+                              </p>
+                            )}
                           </div>
                         </div>
-                        
-                        {/* Hidden Contact Info (would be shown after payment) */}
-                        <div className="hidden">
-                          <div className="border rounded-lg p-4 mb-4">
-                            <h3 className="font-medium mb-2">Hostel Owner Contact Information</h3>
-                            <div className="space-y-2 text-sm">
-                              <p><strong>Phone:</strong> {data?.contactPhone || "Not provided"}</p>
-                              {data?.contactEmail && (
-                                <p><strong>Email:</strong> {data.contactEmail}</p>
-                              )}
-                              {data?.contactWhatsapp && (
-                                <p><strong>WhatsApp:</strong> {data.contactWhatsapp}</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        
+
                         {/* Dates section (always visible) */}
                         <div className="space-y-4">
                           <SelectCalendar booking={data?.Booking} />
                         </div>
-                        
-                        {/* Booking button (would be enabled after payment) */}
+
+                        {/* Booking button (now enabled) */}
                         <div className="mt-4">
                           <form action={createBooking}>
                             <input type="hidden" name="hostelId" value={(await params).id} />
                             <input type="hidden" name="userId" value={user?.id} />
-                            <input type="hidden" name="roomCategoryId" id="selected-category-id" value="" />
-                            
-                            {/* Disabled until payment is complete */}
-                            <Button disabled type="submit" className="w-full bg-gray-400 cursor-not-allowed">
-                              Book Now (Requires Payment)
-                            </Button>
+                            {/* The selected category ID should be passed from RoomCategories client component. */}
+                            {/* This would require a client-side state in RoomCategories and an effect to update a hidden input */}
+                            {/* For simplicity here, assuming `RoomCategories` handles updating a form element, 
+                                or you pass `selectedCategoryId` via a client component prop. */}
+                            <input type="hidden" name="roomCategoryId" id="selected-category-id" value={searchParams?.roomCategoryId || ''} />
+
+                            <BookingSubmitButton /> {/* Your existing submit button */}
                           </form>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      // --- Show Payment Form if not paid ---
+                      <PaymentFormComponent
+                        hostelId={(await params).id}
+                        // These would come from the user's selection in RoomCategories,
+                        // which would need to update searchParams or a client-side state
+                        // For now, these are placeholders. A robust solution needs client-side state in RoomCategories
+                        // or passing these via URL search params
+                        selectedRoomCategoryId={searchParams?.roomCategoryId || ""} // Get from URL or client-side state
+                        selectedRoomPrice={parseFloat(searchParams?.roomPrice || "0")} // Get from URL or client-side state
+                        initiateDarazaPayment={initiateDarazaPayment} // Pass the server action
+                        onPaymentSuccess={() => {
+                          // This function will be called on the client side.
+                          // To re-render the server component with the new `hasUserPaid` status,
+                          // you'd typically need to trigger a revalidation (e.g., via `router.refresh()` from `next/navigation`).
+                          // This would require this component to be a client component, or
+                          // the `onPaymentSuccess` to trigger a redirect or invalidate cache from an action.
+                          // For now, we'll assume a client-side component would handle this better,
+                          // or the user would refresh the page.
+                          console.log("Payment success, page refresh might be needed to see changes.");
+                          // In a real app: router.refresh() if this was a client component.
+                          // For now, the user might need to refresh the page to see the contact info.
+                        }}
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="text-amber-600 bg-amber-50 p-3 rounded-md mb-4">
