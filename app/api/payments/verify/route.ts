@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the payment attempt
-    const payment = await prisma.paymentAttempt.findUnique({
+    const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
       include: {
         hostel: {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update payment status
-    const updatedPayment = await prisma.paymentAttempt.update({
+    const updatedPayment = await prisma.payment.update({
       where: { id: paymentId },
       data: { status: newStatus },
     });

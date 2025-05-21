@@ -14,20 +14,20 @@ enum UserRole {
 }
 
 model User {
-  id           String     @id @unique
-  ProfileImage String?
-  email        String
-  firstName    String
-  lastName     String
-  role         UserRole   @default(STUDENT)
-  Hostel       Hostel[]
-  Favorite     Favorite[]
-  Booking      Booking[]
-  Payment      Payment[]
+  id             String   @id @unique
+  ProfileImage   String?
+  email          String
+  firstName      String
+  lastName       String
+  role           UserRole @default(STUDENT)
+  Hostel         Hostel[]
+  Favorite       Favorite[]
+  Booking        Booking[]
+  Payment        Payment[]
 }
 
 model Hostel {
-  id               String         @id @default(uuid())
+  id               String   @id @default(uuid())
   title            String?
   guests           String?
   Kitchen          String?
@@ -35,29 +35,29 @@ model Hostel {
   photos           String[]
   price            Int?
   UserId           String
-  createdAT        DateTime       @default(now())
-  addedCategory    Boolean        @default(false)
-  addedDescription Boolean        @default(false)
-  addedLocation    Boolean        @default(false)
-  categoryName     String? // General hostel category (e.g. "Wifi", "trending")
+  createdAT        DateTime @default(now())
+  addedCategory    Boolean  @default(false)
+  addedDescription Boolean  @default(false)
+  addedLocation    Boolean  @default(false)
+  categoryName     String?  // General hostel category (e.g. "Wifi", "trending")
   description      String?
   location         String?
   // Added latitude and longitude for precise location
-  latitude         Float?
-  longitude        Float?
+  latitude       Float?
+  longitude      Float?
   // Added location_name for user-friendly display
   location_name    String?
   // Owner contact details
   contactPhone     String?
   contactEmail     String?
   contactWhatsapp  String?
-  contactHidden    Boolean        @default(true) // Whether contact info is hidden until payment
-  User             User?          @relation(fields: [UserId], references: [id])
+  contactHidden    Boolean  @default(true)  // Whether contact info is hidden until payment
+  User             User?    @relation(fields: [UserId], references: [id])
   Favorite         Favorite[]
   Booking          Booking[]
   // New relationship with RoomCategory
   RoomCategory     RoomCategory[]
-  Payment          Payment[]
+  Payment        Payment[]
 }
 
 model Favorite {
@@ -84,47 +84,42 @@ model Booking {
 
 model RoomCategory {
   id             String    @id @default(uuid())
-  name           String // e.g., "shared", "single", "deluxe"
-  price          Int // Price per semester for this category
-  availableRooms Int // Number of available rooms in this category
-  totalRooms     Int // Total number of rooms in this category
+  name           String    // e.g., "shared", "single", "deluxe"
+  price          Int       // Price per semester for this category
+  availableRooms Int       // Number of available rooms in this category
+  totalRooms     Int       // Total number of rooms in this category
   hostel         Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
   hostelId       String
-  description    String? // Optional description of room features
-  photos         String[] // Photos specific to this room type
+  description    String?   // Optional description of room features
+  photos         String[]  // Photos specific to this room type
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   Booking        Booking[]
   Payment        Payment[]
 }
 
-enum PaymentStatus {
-  PENDING
-  PENDING_CONFIRMATION
-  COMPLETED
-  FAILED
-}
+
 
 model Payment {
-  id             String        @id @default(cuid())
-  userId         String
-  hostelId       String
-  roomCategoryId String? // Optional if payment is for overall access, not specific room
-  amount         Int
-  currency       String        @default("UGX")
-  phoneNumber    String
-  transactionId  String?       @unique // Daraza's transaction ID
-  status         PaymentStatus @default(PENDING) // PENDING, SUCCESS, FAILED
-  purpose        String? // e.g., "ACCESS_FEE", "BOOKING_DEPOSIT"
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id              String    @id @default(cuid())
+  userId          String
+  hostelId        String
+  roomCategoryId  String? // Optional if payment is for overall access, not specific room
+  amount          Int
+  currency        String    @default("UGX")
+  phoneNumber     String
+  transactionId   String?   @unique // Daraza's transaction ID
+  status          String    @default("PENDING") // PENDING, SUCCESS, FAILED
+  purpose         String?   // e.g., "ACCESS_FEE", "BOOKING_DEPOSIT"
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id])
-  hostel Hostel @relation(fields: [hostelId], references: [id])
+  user            User      @relation(fields: [userId], references: [id])
+  hostel          Hostel    @relation(fields: [hostelId], references: [id])
 
   // ADD THIS LINE for the explicit relation
-  roomCategory RoomCategory? @relation(fields: [roomCategoryId], references: [id]) // Renamed from roomCategory
-  // And added '?' for optional relation
+  roomCategory    RoomCategory? @relation(fields: [roomCategoryId], references: [id]) // Renamed from roomCategory
+                                                                                 // And added '?' for optional relation
 
   @@index([userId, hostelId])
   @@index([transactionId])
