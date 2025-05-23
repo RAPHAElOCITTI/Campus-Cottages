@@ -301,7 +301,7 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
                         selectedRoomCategoryId={searchParams?.roomCategoryId || ""} // Get from URL or client-side state
                         selectedRoomPrice={parseFloat(searchParams?.roomPrice || "0")} // Get from URL or client-side state
                         initiateDarazaPayment={initiateDarazaPayment} // Pass the server action
-                        onPaymentSuccess={() => {
+                        //onPaymentSuccess={() => {
                           // This function will be called on the client side.
                           // To re-render the server component with the new `hasUserPaid` status,
                           // you'd typically need to trigger a revalidation (e.g., via `router.refresh()` from `next/navigation`).
@@ -309,10 +309,10 @@ export default async function HostelRoute({ params, searchParams }: PageProps) {
                           // the `onPaymentSuccess` to trigger a redirect or invalidate cache from an action.
                           // For now, we'll assume a client-side component would handle this better,
                           // or the user would refresh the page.
-                          console.log("Payment success, page refresh might be needed to see changes.");
+                          //console.log("Payment success, page refresh might be needed to see changes.");
                           // In a real app: router.refresh() if this was a client component.
                           // For now, the user might need to refresh the page to see the contact info.
-                        }}
+                       
                       />
                     )}
                   </div>

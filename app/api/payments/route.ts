@@ -68,4 +68,6 @@ export async function GET(
     console.error('Error in API route:', error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
+
+  console.log()
 }

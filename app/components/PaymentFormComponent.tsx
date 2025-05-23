@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useFormStatus } from "react-dom"; // Hook to get form submission status
+import { useRouter } from "next/navigation"; // <-- IMPORT useRouter
 import { PaymentResponse } from "daraza"; // Import Daraza's PaymentResponse interface
 
 // Define the server action function for payment
@@ -21,7 +22,7 @@ interface PaymentFormComponentProps {
     amount: number,
     phone: string
   ) => Promise<{ success: boolean; message: string }>;
-  onPaymentSuccess: () => void; // Callback for parent to update UI
+  //onPaymentSuccess: () => void; // Callback for parent to update UI
 }
 
 function SubmitButton() {
@@ -38,12 +39,13 @@ export function PaymentFormComponent({
   selectedRoomCategoryId,
   selectedRoomPrice,
   initiateDarazaPayment,
-  onPaymentSuccess,
+  
 }: PaymentFormComponentProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
+  const router = useRouter(); // Initialize the router
   // We are assuming a fixed "access fee" of 5000 UGX for now
   const accessFee = 5000; // As per your existing message
 
@@ -74,7 +76,8 @@ export function PaymentFormComponent({
 
       if (result.success) {
         setPaymentStatus(result.message);
-        onPaymentSuccess(); // Notify parent of success
+       // onPaymentSuccess(); // Notify parent of success
+       router.refresh(); // <-- THE KEY CHANGE HERE
       } else {
         setPaymentError(result.message);
         setPaymentStatus(null);
@@ -130,4 +133,5 @@ export function PaymentFormComponent({
       <Separator className="my-4" />
     </div>
   );
+  console.log()
 }
