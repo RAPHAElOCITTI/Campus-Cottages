@@ -3,7 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Import useEffect
+import { useRouter, useSearchParams } from "next/navigation"; // Import useRouter and useSearchParams
 
 interface RoomCategory {
   id: string;
@@ -20,9 +21,38 @@ interface RoomCategoriesProps {
 }
 
 export function RoomCategories({ roomCategories }: RoomCategoriesProps) {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    roomCategories.length > 0 ? roomCategories[0].id : null
-  );
+  const router = useRouter();
+  const searchParams = useSearchParams(); // Get current search params
+  
+  // Initialize state from URL searchParams or first available category
+  const initialCategoryId = searchParams.get('roomCategoryId') || 
+                            (roomCategories.length > 0 ? roomCategories[0].id : null);
+  
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(initialCategoryId);
+
+  // Effect to update URL when selectedCategoryId changes
+  useEffect(() => {
+    if (selectedCategoryId) {
+      const selectedCategory = roomCategories.find(cat => cat.id === selectedCategoryId);
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set('roomCategoryId', selectedCategoryId);
+      if (selectedCategory) {
+        newSearchParams.set('roomPrice', selectedCategory.price.toString());
+      } else {
+        newSearchParams.delete('roomPrice'); // Remove if category not found or deselected
+      }
+      
+      // Update URL without a full page refresh
+      router.replace(`?${newSearchParams.toString()}`, { scroll: false });
+    } else {
+      // If no category is selected, remove the params from the URL
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.delete('roomCategoryId');
+      newSearchParams.delete('roomPrice');
+      router.replace(`?${newSearchParams.toString()}`, { scroll: false });
+    }
+  }, [selectedCategoryId, roomCategories, router, searchParams]);
+
 
   if (roomCategories.length === 0) {
     return <div className="text-gray-500">No room categories available</div>;
@@ -32,7 +62,15 @@ export function RoomCategories({ roomCategories }: RoomCategoriesProps) {
     <div className="space-y-4">
       <h3 className="text-xl font-semibold mb-2">Room Categories</h3>
       
-      <RadioGroup value={selectedCategoryId || undefined} onValueChange={setSelectedCategoryId}>
+      <RadioGroup 
+        value={selectedCategoryId || undefined} 
+        onValueChange={(value) => {
+          setSelectedCategoryId(value);
+          // When a category is selected, ensure it's logged for debugging
+          const categoryPrice = roomCategories.find(c => c.id === value)?.price;
+          console.log("Selected Room Category ID:", value, "Price:", categoryPrice);
+        }}
+      >
         <div className="grid gap-4">
           {roomCategories.map((category) => (
             <div key={category.id} className="flex items-start space-x-2">
@@ -68,12 +106,16 @@ export function RoomCategories({ roomCategories }: RoomCategoriesProps) {
         </div>
       </RadioGroup>
 
-      {/* Hidden input to submit the selected category */}
-      <input 
+      {/* The hidden input in RoomCategories is no longer strictly necessary for PaymentFormComponent
+          since PaymentFormComponent will now read from searchParams itself.
+          However, it can be useful if you're submitting this form to a Server Action
+          that directly reads form data. If not, you can remove it.
+          For clarity, let's keep it for now as it's harmless. */}
+      {/* <input 
         type="hidden" 
         name="roomCategoryId" 
         value={selectedCategoryId || ""} 
-      />
+      /> */}
     </div>
   );
 }
