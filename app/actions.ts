@@ -269,8 +269,26 @@ export async function initiateDarazaPayment(
   phone: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    // Validate phone number and amount using the Daraza library
-    const validatedPhone = paymentService.validatePhoneNumber(phone);
+    // --- NEW: Phone Number Formatting ---
+    // Remove leading country code (256 or +256) and leading zero (0) if present
+    let formattedPhone = phone.trim();
+    if (formattedPhone.startsWith('+256')) {
+      formattedPhone = formattedPhone.substring(4); // Remove +256
+    } else if (formattedPhone.startsWith('256')) {
+      formattedPhone = formattedPhone.substring(3); // Remove 256
+    } else if (formattedPhone.startsWith('0')) {
+      formattedPhone = formattedPhone.substring(1); // Remove leading 0
+    }
+
+    // After removing prefixes, ensure it's exactly 9 digits
+    // You might want to add more robust validation here, e.g., checking if it's numeric
+    if (formattedPhone.length !== 9 || !/^\d+$/.test(formattedPhone)) {
+        throw new Error("Phone number must be exactly 9 digits after country code/leading zero removal.");
+    }
+    // --- END NEW ---
+
+    // Validate phone number and amount using the Daraza library with formatted number
+    const validatedPhone = paymentService.validatePhoneNumber(formattedPhone);
     const validatedAmount = paymentService.validateAmount(amount);
 
     // Prepare payment data
@@ -294,6 +312,20 @@ export async function initiateDarazaPayment(
       // 2. Associate the payment with the user, hostel, and room category
       // 3. Implement a webhook or polling mechanism to confirm final payment status from Daraza
       //    (this is crucial for actual production systems)
+
+      // You should save a record of this initiated payment in your database here
+      // For example, to track status or link to the user/hostel.
+      await prisma.payment.create({
+        data: {
+          userId: (await getKindeServerSession().getUser())?.id || "unknown", // Get current user ID
+          hostelId: hostelId,
+          roomCategoryId: roomCategoryId,
+          amount: amount,
+          phoneNumber: phone, // Store the original phone number
+          status: 'PENDING', // Mark as pending until webhook/polling confirms
+          purpose: 'ACCESS_FEE', // Custom field to identify this payment purpose
+        },
+      });
 
       return {
         success: true,
