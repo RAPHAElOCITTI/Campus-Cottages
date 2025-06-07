@@ -258,7 +258,7 @@ import MyComponent from "@/app/UploadHandling"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 const paymentService = new PaymentService({
-  apiKey: process.env.DARAZA_API_KEY || "9CifVRh7.7HxqysLUR4K9iTyZQce3yEFTqEa3i1Qm",
+  apiKey: process.env.DARAZA_API_KEY || "EVZZFvuH.lfW22OJsMsVXrt5A4JrJoCkkDWEA4Yss",
 });
 
 // A server action to handle the payment request
