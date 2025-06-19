@@ -74,56 +74,56 @@ export function RoomCategoryDisplay({ roomCategories }: RoomCategoryDisplayProps
                       <FeatureBadge>Community</FeatureBadge>
                     </>
                   )}
-                   {category.name === 'shared' && (
+                   {category.name === 'shared, not self-contained' && (
                     <>
                       <FeatureBadge>Shared Space, not self-contained</FeatureBadge>
                       <FeatureBadge>Budget-friendly</FeatureBadge>
                       <FeatureBadge>Community</FeatureBadge>
                     </>
                   )}
-                  {category.name === 'shared' && (
+                  {category.name === 'shared, self-contained' && (
                     <>
                       <FeatureBadge>Shared Space, self-contained</FeatureBadge>
                       <FeatureBadge>Budget-friendly</FeatureBadge>
                       <FeatureBadge>Community</FeatureBadge>
                     </>
                   )}
-                  {category.name === 'shared' && (
+                  {category.name === 'shared, without balcony' && (
                     <>
                       <FeatureBadge>Shared Space, without balcony</FeatureBadge>
                       <FeatureBadge>Budget-friendly</FeatureBadge>
                       <FeatureBadge>Community</FeatureBadge>
                     </>
                   )}
-                  {category.name === 'shared' && (
+                  {category.name === 'shared, with balcony' && (
                     <>
                       <FeatureBadge>Shared Space, with balcony</FeatureBadge>
                       <FeatureBadge>Budget-friendly</FeatureBadge>
                       <FeatureBadge>Community</FeatureBadge>
                     </>
                   )}
-                   {category.name === 'single' && (
+                   {category.name === 'single, not self-contained' && (
                     <>
                       <FeatureBadge>Private Room, not self-contained</FeatureBadge>
                       <FeatureBadge>Single Bed</FeatureBadge>
                       <FeatureBadge>Privacy</FeatureBadge>
                     </>
                   )}
-                   {category.name === 'single' && (
+                   {category.name === 'single, self-contained' && (
                     <>
                       <FeatureBadge>Private Room, self-contained</FeatureBadge>
                       <FeatureBadge>Single Bed</FeatureBadge>
                       <FeatureBadge>Privacy</FeatureBadge>
                     </>
                   )}
-                  {category.name === 'single' && (
+                  {category.name === 'single, without balcony' && (
                     <>
                       <FeatureBadge>Private Room, without balcony</FeatureBadge>
                       <FeatureBadge>Single Bed</FeatureBadge>
                       <FeatureBadge>Privacy</FeatureBadge>
                     </>
                   )}
-                  {category.name === 'single' && (
+                  {category.name === 'single, with balcony' && (
                     <>
                       <FeatureBadge>Private Room, with balcony</FeatureBadge>
                       <FeatureBadge>Single Bed</FeatureBadge>
