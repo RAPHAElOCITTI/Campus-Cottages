@@ -23,6 +23,13 @@ export const roomCategoryItems: RoomCategoryType[] = [
     imageUrl: "https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images//shared.png",
   },
   {
+    id: 0,
+    name: "double",
+    title: "Double Room",
+    description: "Double room",
+    imageUrl: "https://reikgvkfmbabfnguexdi.supabase.co/storage/v1/object/public/images//double-room.png",
+  },
+  {
     id: 1,
     name: "single",
     title: "Single Room",
