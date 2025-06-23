@@ -30,7 +30,7 @@ const nextConfig= {
   // Configure for dynamic routes
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'campuscottages.vercel.app']
+      allowedOrigins: ['localhost:3000', 'campuscottages.vercel.app'],
       bodySizeLimit: '5mb',
     }
   },
